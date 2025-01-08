@@ -3,7 +3,8 @@
 #include <string.h>
 #include <ctype.h>
 //Functions
-void menu(){}
+void menu()
+{}
 //.............Main............
 void main()
 {

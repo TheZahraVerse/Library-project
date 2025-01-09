@@ -5,6 +5,11 @@
 #include <windows.h>
 //Functions
 void menu();
+void repeat();
+void adminLogin();
+void staffLogin();
+void memberLogin();
+void exitpro();
 //.............Main............
 void main()
 {
@@ -25,27 +30,63 @@ void menu()
     puts("|2. Staff Login");
     puts("|3. Member Login");
     puts("|4. Exit\n");
-    if(isvalid == 0){
-        printf("~Please Enter Your Choice :");
-        scanf("%c" , &choice );
-    }
-    if(isalpha(choice)){
-        printf("Your input is an alphabetical character , use numbers for your choice\n");
-        printf("Please wait a second to start again.\n");
-        Sleep(5000);
-        system("cls");
-        isvalid == 1;
-    }
-    else if(choice-'0' > 4 || choice-'0' < 1){
-            printf("Your number is out of range or you entered an invalid character");
-            continue;
-    }
-     else {
-        printf("valid");
-        isvalid = 1;
-        break;
-     }
+    printf("Please enter your choice:");
+    scanf("%c" , &choice);
 
-
+      switch (choice)
+      {
+        case '1' :
+                isvalid = 1;
+                adminLogin();
+                break;
+        case '2' :
+                isvalid = 1;
+                staffLogin();
+                break;
+        case '3' :
+                isvalid = 1;
+                memberLogin();
+                break;
+        case '4' :
+                isvalid = 1;
+                exitpro();
+                break;
+        default :
+            if(isvalid == 0){
+                repeat();
+                break;
+            }
+      }
     }
+
+}
+//AdminLogin
+void adminLogin()
+{
+    printf("~You are in Admin Login");
+}
+//StaffLogin
+void staffLogin()
+{
+    printf("~You are in Staff Login");
+}
+//MemberLogin
+void memberLogin()
+{
+    printf("~You are in Member Login");
+}
+//Repeat the menu
+void repeat()
+{
+        printf("Your input is not valid\n");
+        printf("Press enter to try again:");
+        getchar();
+        menu();
+
+}
+void exitpro()
+{
+    printf("Are you sure? Press enter to exit:");
+    getchar();
+    exit(1);
 }

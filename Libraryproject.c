@@ -23,7 +23,7 @@ void menu()
 {
     char choice;
     int isvalid =0;
-    while(isvalid == 0){
+
     puts("*******/Welcome to ZedBook Library/*******");
     puts("~You are in : main menu\n____________________");
     puts("|1. Admin Login");
@@ -57,8 +57,6 @@ void menu()
                 break;
             }
       }
-    }
-
 }
 //AdminLogin
 void adminLogin()
@@ -78,15 +76,12 @@ void memberLogin()
 //Repeat the menu
 void repeat()
 {
-        printf("Your input is not valid\n");
-        printf("Press enter to try again:");
-        getchar();
-        menu();
+    printf("~Your input is not valid");
 
 }
 void exitpro()
 {
-    printf("Are you sure? Press enter to exit:");
-    getchar();
+    printf("~Are you sure?\nPress enter to close the program:");
     exit(1);
+//add two choice here
 }

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <windows.h>
+#include <conio.h>
 //define sizes
 #define USERNAME 16
 #define PASSWORD 20

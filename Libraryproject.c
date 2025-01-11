@@ -1,4 +1,4 @@
-//Library management project
+//Library management project---> *PEANUTZEE LIBRARY*
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -356,7 +356,7 @@ int menu()
     char choice;
     int isvalid =0;
     do{
-        puts("*******/Welcome to ZedBook Library/*******");
+        puts("*******/Welcome to PeanutZee Library/*******");
         puts("~You are in : main menu\n____________________");
         puts("|1. Admin Login");
         puts("|2. Staff Login");
@@ -425,20 +425,45 @@ int Login()
     printf("Log in process... \n");
     char user[USERNAME];
     char pass[PASSWORD];
+    char ch ;
+    int i , chance = 3;//the numbers to try your password chance
     printf("Username:");
     scanf(" %s" , user);
     //check the username character
     if(strcmp(user , "admin") == 0){
-        printf("Password:");
-        scanf(" %s" , pass);
-        if(strcmp(pass , "1234") == 0){
-            return 1 ;
-        }
-        else{
-            printf("wrong password,try again!");
+        printf("Password:");//add stars to avoid showing password
+      while(chance > 0){
+            i = 0 ;//for every new chances
+          while(1){
+              ch = getch();
+              if(ch == '\r'){
+                  break;
+              }
+              if( i < sizeof(pass) - 1){
+                  pass[i++] = ch ;
+                  printf("*");
+              }
+            }
+            pass[i] = '\0' ;
+            if(strcmp(pass , "1234") == 0){
+              printf("\n");
+              return 1 ;
+            }
+            else{
+                chance-- ;
             //add limits for trying here
-            return 0 ;
+            if(chance > 0){
+                printf("\nWrong password!\nYou have %d more chances,try again!" , chance);
+                printf("\nPassword:");
+            }
+            else{
+                printf("\nToo many wrong passwords!\nThe program will be closed soon...");
+                Sleep(3000);
+                system("cls");
+                exit(1);
+            }
         }
+      }
     }
     else{
         //check in the files for username

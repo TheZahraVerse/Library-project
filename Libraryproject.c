@@ -17,11 +17,23 @@ int adminMenu();
 void newEmp();
 void staffList();
 void rmEmp();
-void report();
+void report_ad();
 //staff Functions
 int staffMenu();
+void newMem();
+void revival();
+void generalList();
+void rmMem();
+void bookRegister();
+void report_emp();
+void setting_emp();
 //Member Functions
 int memberMenu();
+void memNewBook();
+void memReturn();
+void memAllBooks();
+void availBooks();
+void setting_mem();
 
 //*******************************************...Main
 void main()
@@ -79,7 +91,51 @@ void main()
         rmEmp();
         break;
     case 4 :
-        report();
+        report_ad();
+    }
+    //staff made their choices
+    switch(staff_se)
+    {
+    case 1 :
+        newMem();
+        break;
+    case 2 :
+        revival();
+        break;
+    case 3 :
+        generalList();
+        break;
+    case 4 :
+        rmMem();
+        break;
+    case 5 :
+        bookRegister();
+        break;
+    case 6 :
+        report_emp();
+        break;
+    case 7 :
+        setting_emp();
+        break;
+    }
+    //Member made her choice
+    switch(member_se)
+    {
+    case 1 :
+        memNewBook();
+        break;
+    case 2 :
+        memReturn();
+        break;
+    case 3 :
+        memAllBooks();
+        break;
+    case 4 :
+        availBooks();
+        break;
+    case 5 :
+        setting_mem();
+        break;
     }
 
 
@@ -140,9 +196,9 @@ void rmEmp()
 
 }
 //...................................................reports
-void report()
+void report_ad()
 {
-    return 1;
+
 }
 //                               *STAFF SECTION*
 //......................................................Staff menu
@@ -193,11 +249,105 @@ int staffMenu()
     }while( isvalid == 0);
     return isvalid ;
 }
+//.....................................................new member
+void newMem()
+{
+
+}
+//.....................................................revival membership
+void revival()
+{
+
+}
+//......................................................general list of every member
+void generalList()
+{
+
+}
+//......................................................remove members
+void rmMem()
+{
+
+}
+//......................................................books registering
+void bookRegister()
+{
+
+}
+//.......................................................report for employees
+void report_emp()
+{
+
+}
+//.........................................................staff account settings
+void setting_emp()
+{
+
+}
 //                              *MEMBER SECTION*
 //.....................................................Member menu
 int memberMenu()
 {
-    printf("~You are in Member Login");
+    char choice ;
+    int isvalid = 0;
+    puts("*******welcome member*******");
+    puts("~You are in Member menu\n_____________________________");
+    puts("|1. Borrow new books");
+    puts("|2. Write-in returns");
+    puts("|3. My books");
+    puts("|4. Available books in library");
+    puts("|5. Account setting");
+    puts("|6. Logout and return to main menu");
+    scanf(" %c" , &choice);
+    do{
+        switch(choice)
+        {
+        case '1' :
+            isvalid = 1;
+            break;
+        case '2' :
+            isvalid = 2;
+            break;
+        case '3' :
+            isvalid = 3;
+            break;
+        case '4' :
+            isvalid = 4;
+            break;
+        case '5' :
+            isvalid = 5;
+            break;
+        case '6' :
+            exitpro();
+            break;
+        }
+    }while(isvalid == 0);
+    return isvalid ;
+}
+//........................................................borrow new books
+void memNewBook()
+{
+
+}
+//........................................................return books
+void memReturn()
+{
+
+}
+//.........................................................all of the member's book
+void memAllBooks()
+{
+
+}
+//..........................................................available books to borrow
+void availBooks()
+{
+
+}
+//...........................................................setting for member's account
+void setting_mem()
+{
+
 }
 //                               *GENERAL SECTION*
 //...................................................Main menu managemanet

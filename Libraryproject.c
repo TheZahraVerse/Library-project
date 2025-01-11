@@ -6,40 +6,201 @@
 //define sizes
 #define USERNAME 16
 #define PASSWORD 20
-//Functions
+//..........................................Functions
+//General Functions
 int menu();
+int Login();
 void repeat();
-void adminLogin();
-void staffLogin();
-void memberLogin();
 void exitpro();
-//.............Main............
+//Admin Functions
+int adminMenu();
+void newEmp();
+void staffList();
+void rmEmp();
+void report();
+//staff Functions
+int staffMenu();
+//Member Functions
+int memberMenu();
+
+//*******************************************...Main
 void main()
 {
     //Start the menu as first wall
-    int select = menu();
-    int entry = Login();
+    int select_user = menu();
+    int who = Login();
+    int confirmed;
+    //selection of each characters
+    int admin_se ;
+    int staff_se;
+    int member_se;
     //call the functions by checking the selection
-    switch(select)
+    switch(select_user)
     {
     case 1 :
-        if(entry==1){
-            printf("welcome admin");
-        }
+        if(who == 1){
+            confirmed = 1;
+         }
         break;
     case 2 :
-        staffLogin();
+        if(who == 2){
+            confirmed = 2;
+            break;
+        }
+    case 3 :
+        if(who == 3){
+            confirmed = 3;
+            break;
+        }
+    }
+    /*for those who are confirmed and their menu is open
+    get their selection*/
+    switch(confirmed)
+    {
+    case 1 :
+        admin_se = adminMenu();
+         break;
+    case 2 :
+        staff_se = staffMenu();
         break;
     case 3 :
-        memberLogin();
+         member_se = memberMenu();
+    }
+    //admin made her choice
+    switch(admin_se)
+    {
+    case 1 :
+        newEmp();
         break;
+    case 2 :
+        staffList();
+        break;
+    case 3 :
+        rmEmp();
+        break;
+    case 4 :
+        report();
     }
 
 
 
 
 }
-//Main menu managemanet
+
+//                         *ADMIN SECTION*
+//..................................................Admin menu
+int adminMenu()
+{
+    char choice ;
+    int isvalid=0 ;
+    puts("******/Welcome Admin/*******");
+    puts("~You are in Admin menu\n______________________________________");
+    puts("|1. New employee  registration");
+    puts("|2. View the list of staff");
+    puts("|3. Remove the employee from the system");
+    puts("|4. Reports");
+    puts("|5. Logout and return to main menu\n");
+    printf("Please enter your choice:");
+    scanf(" %c" , &choice);
+    do{
+        switch(choice)
+        {
+        case '1':
+            isvalid = 1;
+            break;
+        case '2':
+            isvalid = 2;
+            break;
+        case '3':
+            isvalid = 3;
+            break;
+        case '4':
+            isvalid = 4;
+            break;
+        case '5':
+            exitpro();
+            break;
+        }
+    }while(isvalid == 0);
+    return isvalid;
+}
+//...................................................new employee
+void newEmp()
+{
+
+}
+//...................................................view staff list
+void staffList()
+{
+
+}
+//...................................................remove employee
+void rmEmp()
+{
+
+}
+//...................................................reports
+void report()
+{
+    return 1;
+}
+//                               *STAFF SECTION*
+//......................................................Staff menu
+int staffMenu()
+{
+    char choice ;
+    int isvalid =0 ;
+    puts("******/Welcome Employee/*******");
+    puts("~You are in Staff menu\n_______________________________");
+    puts("|1. Sign in for new members");
+    puts("|2. Revival membership");
+    puts("|3. General list of members ");
+    puts("|4. Remove members");
+    puts("|5. Register new books");
+    puts("|6. Reports ");
+    puts("|7. Account Setting");
+    puts("|8. Logout and return to main menu\n");
+    printf("Please enter your choice:");
+    scanf(" %c" , &choice);
+    do{
+        switch(choice)
+        {
+            case '1':
+                isvalid = 1;
+                 break;
+            case '2':
+                isvalid = 2;
+                break;
+            case '3':
+                isvalid = 3;
+                break;
+            case '4':
+                isvalid = 4;
+                break;
+            case '5':
+                isvalid = 5;
+                break;
+            case '6':
+                isvalid = 6;
+                break;
+            case '7':
+                isvalid = 7;
+            case '8':
+                exitpro();
+                break;
+        }
+
+    }while( isvalid == 0);
+    return isvalid ;
+}
+//                              *MEMBER SECTION*
+//.....................................................Member menu
+int memberMenu()
+{
+    printf("~You are in Member Login");
+}
+//                               *GENERAL SECTION*
+//...................................................Main menu managemanet
 int menu()
 {
     char choice;
@@ -80,22 +241,7 @@ int menu()
     return isvalid ;
 
 }
-//AdminLogin
-void adminLogin()
-{
-    printf("~You are in Admin Login");
-}
-//StaffLogin
-void staffLogin()
-{
-    printf("~You are in Staff Login");
-}
-//MemberLogin
-void memberLogin()
-{
-    printf("~You are in Member Login");
-}
-//Repeat the menu
+//......................................................Repeat
 void repeat()
 {   char x ;
     printf("~Your input is not valid\n");
@@ -104,6 +250,7 @@ void repeat()
     system("cls");
     menu();
 }
+//.....................................................exit
 void exitpro()
 {
     int x ;
@@ -122,7 +269,7 @@ void exitpro()
         menu();
     }
 }
-//log in function
+//......................................................log in
 int Login()
 {
     printf("Log in process... \n");
@@ -134,7 +281,7 @@ int Login()
     if(strcmp(user , "admin") == 0){
         printf("Password:");
         scanf(" %s" , pass);
-        if(strcmp(pass , "adminishere4you") == 0){
+        if(strcmp(pass , "1234") == 0){
             return 1 ;
         }
         else{

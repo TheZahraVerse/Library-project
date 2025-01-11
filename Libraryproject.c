@@ -3,8 +3,11 @@
 #include <string.h>
 #include <ctype.h>
 #include <windows.h>
+//define sizes
+#define USERNAME 16
+#define PASSWORD 20
 //Functions
-void menu();
+int menu();
 void repeat();
 void adminLogin();
 void staffLogin();
@@ -13,13 +16,31 @@ void exitpro();
 //.............Main............
 void main()
 {
-    menu();
+    //Start the menu as first wall
+    int select = menu();
+    int entry = Login();
+    //call the functions by checking the selection
+    switch(select)
+    {
+    case 1 :
+        if(entry==1){
+            printf("welcome admin");
+        }
+        break;
+    case 2 :
+        staffLogin();
+        break;
+    case 3 :
+        memberLogin();
+        break;
+    }
+
 
 
 
 }
 //Main menu managemanet
-void menu()
+int menu()
 {
     char choice;
     int isvalid =0;
@@ -36,18 +57,16 @@ void menu()
         {
           case '1' :
                   isvalid = 1;
-                  adminLogin();
                   break;
           case '2' :
-                  isvalid = 1;
-                  staffLogin();
+                  isvalid = 2;
+
                   break;
           case '3' :
-                  isvalid = 1;
-                  memberLogin();
+                  isvalid = 3;
                   break;
           case '4' :
-                  isvalid = 1;
+                  isvalid = 4;
                   exitpro();
                   break;
           default :
@@ -58,6 +77,7 @@ void menu()
             }
 
         }while( isvalid == 0);
+    return isvalid ;
 
 }
 //AdminLogin
@@ -101,4 +121,33 @@ void exitpro()
         system("cls");
         menu();
     }
+}
+//log in function
+int Login()
+{
+    printf("Log in process... \n");
+    char user[USERNAME];
+    char pass[PASSWORD];
+    printf("Username:");
+    scanf(" %s" , user);
+    //check the username character
+    if(strcmp(user , "admin") == 0){
+        printf("Password:");
+        scanf(" %s" , pass);
+        if(strcmp(pass , "adminishere4you") == 0){
+            return 1 ;
+        }
+        else{
+            printf("wrong password,try again!");
+            //add limits for trying here
+            return 0 ;
+        }
+    }
+    else{
+        //check in the files for username
+        //check in the files for passwords
+    return 2 ;
+    return 3 ;
+    }
+
 }

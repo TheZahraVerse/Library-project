@@ -7,6 +7,8 @@
 //define sizes
 #define USERNAME 16
 #define PASSWORD 20
+#define ADMIN_USERNAME "admin"
+#define ADMIN_PASS "1234"
 //..........................................Functions
 //General Functions
 int menu();
@@ -93,6 +95,11 @@ void main()
         break;
     case 4 :
         report_ad();
+        break;
+    case 5 :
+        repeat();
+        adminMenu();
+        break;
     }
     //staff made their choices
     switch(staff_se)
@@ -148,8 +155,9 @@ void main()
 //..................................................Admin menu
 int adminMenu()
 {
-    char choice ;
+    char choice[100] , ch ;
     int isvalid=0 ;
+    do{
     puts("******/Welcome Admin/*******");
     puts("~You are in Admin menu\n______________________________________");
     puts("|1. New employee  registration");
@@ -158,9 +166,11 @@ int adminMenu()
     puts("|4. Reports");
     puts("|5. Logout and return to main menu\n");
     printf("Please enter your choice:");
-    scanf(" %c" , &choice);
-    do{
-        switch(choice)
+    scanf(" %s" , &choice);
+    if( isdigit(choice[0]) && choice[1]=='\0'){
+        ch = choice[0];
+    }
+        switch(ch)
         {
         case '1':
             isvalid = 1;
@@ -177,6 +187,9 @@ int adminMenu()
         case '5':
             exitpro();
             break;
+        default :
+            if(isvalid == 0)
+                return 5 ;
         }
     }while(isvalid == 0);
     return isvalid;
@@ -205,7 +218,7 @@ void report_ad()
 //......................................................Staff menu
 int staffMenu()
 {
-    char choice ;
+    char choice[100] , ch ;
     int isvalid =0 ;
     puts("******/Welcome Employee/*******");
     puts("~You are in Staff menu\n_______________________________");
@@ -218,9 +231,12 @@ int staffMenu()
     puts("|7. Account Setting");
     puts("|8. Logout and return to main menu\n");
     printf("Please enter your choice:");
-    scanf(" %c" , &choice);
+    scanf(" %s" , &choice);
+    if( isdigit(choice[0]) && choice[1]=='\0'){
+        ch = choice[0];
+    }
     do{
-        switch(choice)
+        switch(ch)
         {
             case '1':
                 isvalid = 1;
@@ -289,7 +305,7 @@ void setting_emp()
 //.....................................................Member menu
 int memberMenu()
 {
-    char choice ;
+    char choice[100] , ch ;
     int isvalid = 0;
     puts("*******welcome member*******");
     puts("~You are in Member menu\n_____________________________");
@@ -299,9 +315,12 @@ int memberMenu()
     puts("|4. Available books in library");
     puts("|5. Account setting");
     puts("|6. Logout and return to main menu");
-    scanf(" %c" , &choice);
+    scanf(" %s" , &choice);
+    if( isdigit(choice[0]) && choice[1]=='\0'){
+        ch = choice[0];
+    }
     do{
-        switch(choice)
+        switch(ch)
         {
         case '1' :
             isvalid = 1;
@@ -354,7 +373,8 @@ void setting_mem()
 //...................................................Main menu managemanet
 int menu()
 {
-    char choice;
+    char choice[100];
+    char ch;
     int isvalid =0;
     do{
         puts("*******/Welcome to PeanutZee Library/*******");
@@ -364,31 +384,33 @@ int menu()
         puts("|3. Member Login");
         puts("|4. Exit\n");
         printf("Please enter your choice:");
-        scanf(" %c" , &choice);
-        switch (choice)
-        {
-          case '1' :
-                  isvalid = 1;
-                  break;
-          case '2' :
-                  isvalid = 2;
-
-                  break;
-          case '3' :
-                  isvalid = 3;
-                  break;
-          case '4' :
-                  isvalid = 4;
-                  exitpro();
-                  break;
-          default :
-              if(isvalid == 0){
-                  repeat();
-              }
-
+        scanf(" %s" , &choice);
+        if( isdigit(choice[0]) && choice[1]=='\0'){
+            ch = choice[0];
+        }
+           switch (ch)
+           {
+           case '1' :
+                   isvalid = 1;
+                   break;
+           case '2' :
+                   isvalid = 2;
+                   break;
+           case '3' :
+                   isvalid = 3;
+                   break;
+           case '4' :
+                   isvalid = 4;
+                   exitpro();
+                   break;
+           default :
+               if(isvalid == 0){
+                   repeat();
+               }
             }
 
-        }while( isvalid == 0);
+    }while( isvalid == 0);
+
     return isvalid ;
 
 }
@@ -397,9 +419,8 @@ void repeat()
 {   char x ;
     printf("~Your input is not valid\n");
     printf("Enter any key to start again:");
-    getche(x);
+    x = getche();
     system("cls");
-    menu();
 }
 //.....................................................exit
 void exitpro()
@@ -431,7 +452,7 @@ int Login()
     printf("Username:");
     scanf(" %s" , user);
     //check the username character
-    if(strcmp(user , "admin") == 0){
+    if(strcmp(user , ADMIN_USERNAME) == 0){
         printf("Password:");//add stars to avoid showing password
       while(chance > 0){
             i = 0 ;//for every new chances
@@ -440,13 +461,19 @@ int Login()
               if(ch == '\r'){
                   break;
               }
-              if( i < sizeof(pass) - 1){
+              else if( ch == '\b'){
+                if( i > 0){//using backspace
+                    i-- ;
+                    printf("\b \b");
+                }
+              }
+              else if( i < sizeof(pass) - 1){
                   pass[i++] = ch ;
                   printf("*");
               }
             }
             pass[i] = '\0' ;
-            if(strcmp(pass , "1234") == 0){
+            if(strcmp(pass , ADMIN_PASS) == 0){
               printf("\n");
               return 1 ;
             }
@@ -466,7 +493,8 @@ int Login()
         }
       }
     }
-    else{
+    else{//staff
+
         //check in the files for username
         //check in the files for passwords
     return 2 ;

@@ -9,6 +9,8 @@
 #define PASSWORD 20
 #define ADMIN_USERNAME "admin"
 #define ADMIN_PASS "1234"
+#define EMPFILE "Staffprofile.txt"
+#define MEMFILE "Membersprofile.txt"
 //..........................................Functions
 //General Functions
 int menu();
@@ -37,6 +39,33 @@ void memReturn();
 void memAllBooks();
 void availBooks();
 void setting_mem();
+//Staff structure
+struct employee
+{
+    char name[20];
+    char family[20];
+    char join_date[10];
+    char phone[10];
+    char id[10];
+    char email[30];
+    char username_emp[10];
+    char pass_emp[16];
+};
+struct employee *e ;//pointer
+//Members structure
+struct member
+{
+    char name[20];
+    char family[20];
+    char join_date[10];
+    char validate[10];
+    char phone[10];
+    char id[10];
+    char email[30];
+    char username_mem[10];
+    char pass_mem[16]
+};
+struct member *m ;//pointer
 
 //*******************************************...Main
 void main()
@@ -445,14 +474,17 @@ void exitpro()
 int Login()
 {
     printf("Log in process... \n");
-    char user[USERNAME];
-    char pass[PASSWORD];
+    char user_input[USERNAME];
+    char pass_input[PASSWORD];
     char ch ;
     int i , chance = 3;//the numbers to try your password chance
+    //excited usernames and passwords reads from files
+    char user_file[USERNAME];
+    char pass_file[PASSWORD];
     printf("Username:");
-    scanf(" %s" , user);
-    //check the username character
-    if(strcmp(user , ADMIN_USERNAME) == 0){
+    scanf(" %s" , user_input);
+    //check the input username character
+    if(strcmp(user_input , ADMIN_USERNAME) == 0){
         printf("Password:");//add stars to avoid showing password
       while(chance > 0){
             i = 0 ;//for every new chances
@@ -467,13 +499,13 @@ int Login()
                     printf("\b \b");
                 }
               }
-              else if( i < sizeof(pass) - 1){
-                  pass[i++] = ch ;
+              else if( i < sizeof(pass_input) - 1){
+                  pass_input[i++] = ch ;
                   printf("*");
               }
             }
-            pass[i] = '\0' ;
-            if(strcmp(pass , ADMIN_PASS) == 0){
+            pass_input[i] = '\0' ;
+            if(strcmp(pass_input , ADMIN_PASS) == 0){
               printf("\n");
               return 1 ;
             }
@@ -494,7 +526,18 @@ int Login()
       }
     }
     else{//staff
-
+        FILE *a , *b ;
+        a = fopen( EMPFILE , "r");
+        if( a == NULL ){
+            printf("Could not read staff file!");
+            return 0;
+        }
+        else{
+            fgets(user_file , USERNAME , a);
+            if( strcmp(user_input , user_file) == 0){
+                //you should define a function for this!!!
+            }
+        }
         //check in the files for username
         //check in the files for passwords
     return 2 ;

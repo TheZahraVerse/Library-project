@@ -42,19 +42,22 @@ void setting_mem();
 //Staff structure
 struct employee
 {
+    char username_emp[10];
+    char pass_emp[16];
     char name[20];
     char family[20];
     char join_date[10];
     char phone[10];
     char id[10];
     char email[30];
-    char username_emp[10];
-    char pass_emp[16];
+    struct employee *link ;
 };
-struct employee *e ;//pointer
+struct employee *start_e , *e;
 //Members structure
 struct member
 {
+    char username_mem[10];
+    char pass_mem[16];
     char name[20];
     char family[20];
     char join_date[10];
@@ -62,14 +65,17 @@ struct member
     char phone[10];
     char id[10];
     char email[30];
-    char username_mem[10];
-    char pass_mem[16]
+    struct member *link ;
 };
-struct member *m ;//pointer
+struct member *start_m , *m;
 
 //*******************************************...Main
 void main()
 {
+    start_e = malloc(sizeof(struct employee));
+    e = start_e ;
+    start_m = malloc(sizeof(struct member));
+    m = start_m ;
     //Start the menu as first wall
     int select_user = menu();
     int who = Login();
@@ -114,7 +120,7 @@ void main()
     switch(admin_se)
     {
     case 1 :
-        newEmp();
+        newEmp(e);
         break;
     case 2 :
         staffList();
@@ -199,6 +205,9 @@ int adminMenu()
     if( isdigit(choice[0]) && choice[1]=='\0'){
         ch = choice[0];
     }
+    else{
+        ch = '6' ;
+    }
         switch(ch)
         {
         case '1':
@@ -216,16 +225,35 @@ int adminMenu()
         case '5':
             exitpro();
             break;
-        default :
-            if(isvalid == 0)
-                return 5 ;
+        case '6' :
+            repeat();
+            break;
         }
     }while(isvalid == 0);
     return isvalid;
 }
 //...................................................new employee
-void newEmp()
+void newEmp(struct employee *x )
 {
+    struct employee *nx;
+    int num ;
+    FILE *f ;
+    f = fopen("EMPFILE" , "r+");
+    while(f == NULL){
+        printf("The staff file has not found !\nYou will return to admin menu...");
+        Sleep(5000);
+        system("cls");
+        adminMenu();
+    }
+    printf("Please enter the number of staff that you want to add:");
+    scanf(" %d" , num);//issue
+    printf("\nNow , fill the information of each employee:");
+    for(int i = 0 ; i < num ; i++){
+        nx = malloc(sizeof(struct employee));
+        printf("Name: ");
+        gets( nx->name );
+    }
+
 
 }
 //...................................................view staff list
@@ -457,13 +485,13 @@ void exitpro()
     int x ;
     printf("~Are you sure you want to exit?   | 1.Yes  / 2.No | : ");
     scanf(" %d" , &x);
-    if( x == 1){
+    while( x == 1){
         printf("Exiting the program....");
         Sleep(3000);
         system("cls");
         exit(1);
     }
-    else if(x == 2){
+    while(x == 2){
         printf("Returning to main menu....");
         Sleep(3000);
         system("cls");

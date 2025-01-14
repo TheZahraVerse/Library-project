@@ -42,21 +42,21 @@ void setting_mem();
 //Staff structure
 struct employee
 {
-    char username_emp[10];
+    char username_emp[16];
     char pass_emp[16];
     char name[20];
     char family[20];
     char join_date[10];
     char phone[10];
     char id[10];
-    char email[30];
+    char email[40];
     struct employee *link ;
 };
 struct employee *start_e , *e;
 //Members structure
 struct member
 {
-    char username_mem[10];
+    char username_mem[16];
     char pass_mem[16];
     char name[20];
     char family[20];
@@ -64,10 +64,10 @@ struct member
     char validate[10];
     char phone[10];
     char id[10];
-    char email[30];
+    char email[40];
     struct member *link ;
 };
-struct member *start_m , *m;
+struct member *start_m  , *m;
 
 //*******************************************...Main
 void main()
@@ -121,6 +121,7 @@ void main()
     {
     case 1 :
         newEmp(e);
+        e = e->link ;
         break;
     case 2 :
         staffList();
@@ -233,28 +234,69 @@ int adminMenu()
     return isvalid;
 }
 //...................................................new employee
-void newEmp(struct employee *x )
+void newEmp(struct employee *x)
 {
-    struct employee *nx;
-    int num ;
     FILE *f ;
-    f = fopen("EMPFILE" , "r+");
-    while(f == NULL){
+    f = fopen(EMPFILE , "a");
+    if(f == NULL){
         printf("The staff file has not found !\nYou will return to admin menu...");
         Sleep(5000);
         system("cls");
         adminMenu();
     }
-    printf("Please enter the number of staff that you want to add:");
-    scanf(" %d" , num);//issue
-    printf("\nNow , fill the information of each employee:");
-    for(int i = 0 ; i < num ; i++){
-        nx = malloc(sizeof(struct employee));
-        printf("Name: ");
-        gets( nx->name );
+    else{//get info and add them to file
+        puts("~New employee informations:");
+        printf("First name:");
+        scanf(" %29s" , x->name);
+
+        printf("Last name:");
+        scanf(" %29s" , x->family);
+
+        printf("ID number:");
+        scanf(" %9s" , x->id);
+
+        printf("Join date(dd/mm/yyyy):");
+        scanf(" %9s" , x->join_date);
+
+        printf("Phone number:");
+        scanf(" %10s" , x->phone);
+
+        printf("E-mail:");
+        scanf(" %39s" , x->email);
+
+        printf("Username:");//add condition
+        scanf(" %15s" , x->username_emp);
+
+        printf("Password:");//add double check
+        scanf(" %15s" , x->pass_emp);
+
+        //add info to the file by this sort
+        fputs("\n" , f);
+        fputs(x->username_emp , f);
+        fputs("\n" , f);
+        fputs(x->pass_emp , f);
+        fputs("\n" , f);
+        fputs(x->id , f);
+        fputs("\n" , f);
+        fputs(x->join_date , f);
+        fputs("\n" , f);
+        fputs(x->name , f);
+        fputs("\n" , f);
+        fputs(x->family , f);
+        fputs("\n" , f);
+        fputs(x->phone , f);
+        fputs("\n" , f);
+        fputs(x->email , f);
+
+        //if the conditions worked out , you can write a better massage
+        printf("New employee added successfully.\nPress any key to return to admin menu:");
+        fclose(f);
+        char x = getche();
+        puts("\nReturning to admin menu...");
+        Sleep(3000);
+        system("cls");
+        adminMenu();//issue to choose again
     }
-
-
 }
 //...................................................view staff list
 void staffList()

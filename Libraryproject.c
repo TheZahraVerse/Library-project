@@ -7,24 +7,24 @@
 //define sizes
 #define USERNAME 16
 #define PASSWORD 20
-#define ADMIN_USERNAME "admin"
-#define ADMIN_PASS "1234"
+#define ADMIN_USERNAME "a"
+#define ADMIN_PASS "123"
 #define EMPFILE "Staffprofile.txt"
 #define MEMFILE "Membersprofile.txt"
 //..........................................Functions
 //General Functions
-int menu();
-int Login();
-void repeat();
-void exitpro();
+int menu();//done
+int Login();//50 - 50
+void repeat();//done
+void exitpro();//done
 //Admin Functions
-int adminMenu();
-void newEmp();
+int adminMenu();//done
+void newEmp();//done
 void staffList();
 void rmEmp();
 void report_ad();
 //staff Functions
-int staffMenu();
+int staffMenu();//done
 void newMem();
 void revival();
 void generalList();
@@ -33,7 +33,7 @@ void bookRegister();
 void report_emp();
 void setting_emp();
 //Member Functions
-int memberMenu();
+int memberMenu();//done
 void memNewBook();
 void memReturn();
 void memAllBooks();
@@ -48,7 +48,7 @@ struct employee
     char family[20];
     char join_date[10];
     char phone[10];
-    char id[10];
+    char id_emp[15];
     char email[40];
     struct employee *link ;
 };
@@ -63,7 +63,7 @@ struct member
     char join_date[10];
     char validate[10];
     char phone[10];
-    char id[10];
+    char id_mem[15];
     char email[40];
     struct member *link ;
 };
@@ -124,7 +124,8 @@ void main()
         e = e->link ;
         break;
     case 2 :
-        staffList();
+        staffList(e);
+        e = e->link ;
         break;
     case 3 :
         rmEmp();
@@ -253,13 +254,13 @@ void newEmp(struct employee *x)
         scanf(" %29s" , x->family);
 
         printf("ID number:");
-        scanf(" %9s" , x->id);
+        scanf(" %15s" , x->id_emp);//issue in saving id
 
         printf("Join date(dd/mm/yyyy):");
-        scanf(" %9s" , x->join_date);
+        scanf(" %10s" , x->join_date);
 
         printf("Phone number:");
-        scanf(" %10s" , x->phone);
+        scanf(" %11s" , x->phone);
 
         printf("E-mail:");
         scanf(" %39s" , x->email);
@@ -271,38 +272,78 @@ void newEmp(struct employee *x)
         scanf(" %15s" , x->pass_emp);
 
         //add info to the file by this sort
-        fputs("\n" , f);
-        fputs(x->username_emp , f);
-        fputs("\n" , f);
-        fputs(x->pass_emp , f);
-        fputs("\n" , f);
-        fputs(x->id , f);
-        fputs("\n" , f);
-        fputs(x->join_date , f);
-        fputs("\n" , f);
-        fputs(x->name , f);
-        fputs("\n" , f);
-        fputs(x->family , f);
-        fputs("\n" , f);
-        fputs(x->phone , f);
-        fputs("\n" , f);
-        fputs(x->email , f);
+        fprintf(f , "\n");
+        fprintf(f , "%s\n" , x->username_emp);
+        fprintf(f , "%s\n" , x->pass_emp);
+        fprintf(f , "%s\n" , x->id_emp);
+        fprintf(f , "%s\n" , x->join_date);
+        fprintf(f , "%s\n" , x->name);
+        fprintf(f , "%s\n" , x->family);
+        fprintf(f , "%s\n" , x->phone);
+        fprintf(f , "%s\n" , x->email);
 
         //if the conditions worked out , you can write a better massage
         printf("New employee added successfully.\nPress any key to return to admin menu:");
         fclose(f);
-        char x = getche();
-        puts("\nReturning to admin menu...");
+        getche();
+        printf("\n\nReturning to admin menu...");
         Sleep(3000);
         system("cls");
         adminMenu();//issue to choose again
     }
 }
 //...................................................view staff list
-void staffList()
+void staffList(struct employee *x)
 {
-
+    //system cls
+    puts("\n~You are watching the list of staff~");
+    puts("______________________________________");
+    FILE *f ;
+    f = fopen(EMPFILE , "r");
+    if(f == NULL){
+        printf("The staff file has not found !\nYou will return to admin menu...");
+        Sleep(5000);
+        system("cls");
+        adminMenu();
+    }
+    else{
+       int empcount = 1 ;
+       while(feof(f)== 0){
+        fscanf(f , "%s\n" , x->username_emp);
+        fscanf(f , "%s\n" , x->pass_emp);
+        fscanf(f , "%s\n" , x->id_emp);
+        fscanf(f , "%s\n" , x->join_date);
+        fscanf(f , "%s\n" , x->name);
+        fscanf(f , "%s\n" , x->family);
+        fscanf(f , "%s\n" , x->phone);
+        fscanf(f , "%s\n" , x->email);
+        if(x->username_emp == EOF)
+            break;
+        //show the list
+        printf("|~~Employee No.%d~~\n" , empcount++);
+        printf("|First name   :  %s\n" , x->name);
+        printf("|Last name    :  %s\n" , x->family);
+        printf("|ID number    :  %s\n" , x->id_emp);
+        printf("|Phone number :  %s\n" , x->phone);
+        printf("|E-mail       :  %s\n" , x->email);
+        printf("|Join date    :  %s\n" , x->join_date);
+        printf("|Username     :  %s\n" , x->username_emp);
+        printf("|Password     :  %s\n" , x->pass_emp);
+        puts("______________________________________");
+        }
+        if(empcount == 1)
+            printf("No staff data found!");
+    }
+    fclose(f);
+    printf("Press any key to return to admin menu:");
+    getche();
+    printf("\n\nReturning to admin menu...");
+    Sleep(3000);
+    system("cls");
+    adminMenu();//issue to choose again
 }
+
+
 //...................................................remove employee
 void rmEmp()
 {

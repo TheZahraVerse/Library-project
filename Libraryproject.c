@@ -15,6 +15,7 @@
 //General Functions
 int menu();//done
 int Login();//50 - 50
+void hidepass(char pass[PASSWORD]);
 void repeat();//done
 void exitpro();//done
 //Admin Functions
@@ -79,6 +80,9 @@ void main()
     //Start the menu as first wall
     int select_user = menu();
     int who = Login();
+    //not entered
+    if(who == 0)
+        select_user = 0 ;
     int confirmed;
     //selection of each characters
     int admin_se ;
@@ -87,6 +91,10 @@ void main()
     //call the functions by checking the selection
     switch(select_user)
     {
+    case 0 ://Issue in repeating the menu again
+        repeat();
+        menu();
+        break;
     case 1 :
         if(who == 1){
             confirmed = 1;
@@ -95,13 +103,13 @@ void main()
     case 2 :
         if(who == 2){
             confirmed = 2;
-            break;
         }
+        break ;
     case 3 :
         if(who == 3){
             confirmed = 3;
-            break;
         }
+        break;
     }
     /*for those who are confirmed and their menu is open
     get their selection*/
@@ -598,24 +606,7 @@ int Login()
     if(strcmp(user_input , ADMIN_USERNAME) == 0){
         printf("Password:");//add stars to avoid showing password
       while(chance > 0){
-            i = 0 ;//for every new chances
-          while(1){
-              ch = getch();
-              if(ch == '\r'){
-                  break;
-              }
-              else if( ch == '\b'){
-                if( i > 0){//using backspace
-                    i-- ;
-                    printf("\b \b");
-                }
-              }
-              else if( i < sizeof(pass_input) - 1){
-                  pass_input[i++] = ch ;
-                  printf("*");
-              }
-            }
-            pass_input[i] = '\0' ;
+            hidepass(pass_input);//hide on screen
             if(strcmp(pass_input , ADMIN_PASS) == 0){
               printf("\n");
               return 1 ;
@@ -633,26 +624,82 @@ int Login()
                 system("cls");
                 exit(1);
             }
-        }
+            }
       }
     }
-    else{//staff
-        FILE *a , *b ;
-        a = fopen( EMPFILE , "r");
-        if( a == NULL ){
-            printf("Could not read staff file!");
-            return 0;
+    else{
+        FILE *s , *m ;
+        s = fopen(EMPFILE , "r");
+        m = fopen(MEMFILE , "r");
+        if(s == NULL){
+            printf("The staff file has not found!\nReturning to main menu...");
+            Sleep(4000);
+            exitpro();
         }
         else{
-            fgets(user_file , USERNAME , a);
-            if( strcmp(user_input , user_file) == 0){
-                //you should define a function for this!!!
-            }
-        }
-        //check in the files for username
-        //check in the files for passwords
-    return 2 ;
-    return 3 ;
-    }
+           while(feof(s)==0){
+            fgets(user_file ,USERNAME , s);
+            user_file[strcspn(user_file, "\n")] = '\0';
 
+            if(strcmp(user_file , user_input) == 0){
+                printf("Password: ");
+                hidepass(pass_input);
+                fgets(pass_file , PASSWORD , s);
+                pass_file[strcspn(pass_file, "\n")] = '\0';
+
+                if(strcmp(pass_file , pass_input) == 0){
+                    printf("~Login successfully as staff~\n");
+                    fclose(s);
+                    return 2 ;
+                }else{
+                    printf("The password is incorrect!");
+                    fclose(s);
+                }
+             }
+           }
+           while(feof(m)==0){
+            fgets(user_file , USERNAME , m);
+            user_file[strcspn(user_file, "\n")] = '\0';
+
+            if(strcmp(user_file , user_input)==0){
+                printf("Password: ");
+                hidepass(pass_input);
+                fgets(pass_file , PASSWORD , m);
+                pass_file[strcspn(pass_file, "\n")] = '\0';
+
+                if(strcmp(pass_file , pass_input)==0){
+                    printf("~Login successfully as member~\n");
+                    fclose(m);
+                    return 3;
+                }else{
+                    printf("The password is incorrect!");
+                    fclose(m);
+                }
+            }
+
+           }
+        }
+
+    }
 }
+void hidepass(char pass[PASSWORD]) {
+    char ch;
+    int i = 0;
+    while (1) {
+        ch = getch();
+        if (ch == '\r') { // Enter
+            break;
+        } else if (ch == '\b') { // Backspace
+            if (i > 0) {
+                i--;
+                printf("\b \b");
+            }
+        } else if (i < PASSWORD - 1) {
+            pass[i++] = ch;
+            printf("*");
+        }
+    }
+    pass[i] = '\0';
+}
+
+

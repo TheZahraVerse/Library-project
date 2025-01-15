@@ -14,14 +14,14 @@
 //..........................................Functions
 //General Functions
 int menu();//done
-int Login();//50 - 50
-void hidepass(char pass[PASSWORD]);
+int Login();//50 - 50//there is a problem in process
+void hidepass(char pass[PASSWORD]);//done
 void repeat();//done
 void exitpro();//done
 //Admin Functions
 int adminMenu();//done
 void newEmp();//done
-void staffList();
+void staffList();//done
 void rmEmp();
 void report_ad();
 //staff Functions
@@ -49,7 +49,7 @@ struct employee
     char family[20];
     char join_date[10];
     char phone[10];
-    char id_emp[15];
+    char id_emp[20];
     char email[40];
     struct employee *link ;
 };
@@ -64,7 +64,7 @@ struct member
     char join_date[10];
     char validate[10];
     char phone[10];
-    char id_mem[15];
+    char id_mem[20];
     char email[40];
     struct member *link ;
 };
@@ -256,28 +256,28 @@ void newEmp(struct employee *x)
     else{//get info and add them to file
         puts("~New employee informations:");
         printf("First name:");
-        scanf(" %29s" , x->name);
+        scanf(" %s" , x->name);
 
         printf("Last name:");
-        scanf(" %29s" , x->family);
+        scanf(" %s" , x->family);
 
         printf("ID number:");
-        scanf(" %15s" , x->id_emp);//issue in saving id
+        scanf(" %s" , x->id_emp);//issue in saving id
 
         printf("Join date(dd/mm/yyyy):");
-        scanf(" %10s" , x->join_date);
+        scanf(" %s" , x->join_date);
 
         printf("Phone number:");
-        scanf(" %11s" , x->phone);
+        scanf(" %s" , x->phone);
 
         printf("E-mail:");
-        scanf(" %39s" , x->email);
+        scanf(" %s" , x->email);
 
         printf("Username:");//add condition
-        scanf(" %15s" , x->username_emp);
+        scanf(" %s" , x->username_emp);
 
         printf("Password:");//add double check
-        scanf(" %15s" , x->pass_emp);
+        scanf(" %s" , x->pass_emp);
 
         //add info to the file by this sort
         fprintf(f , "\n");
@@ -417,6 +417,17 @@ int staffMenu()
 //.....................................................new member
 void newMem()
 {
+    FILE *m ;
+    m = fopen(MEMFILE , "a");
+    if(m == NULL){
+        printf("\n~The member file has not found!\nReturning to staff menu...");
+        Sleep(4000);
+        system("cls");
+        staffMenu();
+    }
+    else{
+
+    }
 
 }
 //.....................................................revival membership
@@ -463,6 +474,7 @@ int memberMenu()
     puts("|4. Available books in library");
     puts("|5. Account setting");
     puts("|6. Logout and return to main menu");
+    printf("Please enter your choice:");
     scanf(" %s" , &choice);
     if( isdigit(choice[0]) && choice[1]=='\0'){
         ch = choice[0];
@@ -590,7 +602,7 @@ void exitpro()
     }
 }
 //......................................................log in
-int Login()
+int Login()//input for user selection
 {
     printf("Log in process... \n");
     char user_input[USERNAME];
@@ -603,100 +615,134 @@ int Login()
     printf("Username:");
     scanf(" %s" , user_input);
     //check the input username character
-    if(strcmp(user_input , ADMIN_USERNAME) == 0){
-        printf("Password:");//add stars to avoid showing password
-      while(chance > 0){
-            hidepass(pass_input);//hide on screen
-            if(strcmp(pass_input , ADMIN_PASS) == 0){
-              printf("\n");
-              return 1 ;
+
+        if(strcmp(user_input , ADMIN_USERNAME) == 0){
+            printf("Password:");//add stars to avoid showing password
+            while(chance > 0){
+                hidepass(pass_input);//hide on screen
+                if(strcmp(pass_input , ADMIN_PASS) == 0){
+                    printf("\n~Login successfully as admin~\n");
+                    printf("\n");
+                    return 1 ;
+                }
+                else{
+                    chance-- ;
+                //add limits for trying here
+                    if(chance > 0){
+                        printf("\nWrong password!\nYou have %d more chances,try again!" , chance);
+                        printf("\nPassword:");
+                    }
+                    else{
+                        printf("\nToo many wrong passwords!\nThe program will be closed soon...");
+                        Sleep(3000);
+                        system("cls");
+                        exit(1);
+                    }
+                }
             }
-            else{
-                chance-- ;
-            //add limits for trying here
-            if(chance > 0){
-                printf("\nWrong password!\nYou have %d more chances,try again!" , chance);
-                printf("\nPassword:");
-            }
-            else{
-                printf("\nToo many wrong passwords!\nThe program will be closed soon...");
-                Sleep(3000);
-                system("cls");
-                exit(1);
-            }
-            }
-      }
-    }
-    else{
+        }
+
         FILE *s , *m ;
+
         s = fopen(EMPFILE , "r");
-        m = fopen(MEMFILE , "r");
         if(s == NULL){
             printf("The staff file has not found!\nReturning to main menu...");
             Sleep(4000);
             exitpro();
         }
         else{
-           while(feof(s)==0){
-            fgets(user_file ,USERNAME , s);
-            user_file[strcspn(user_file, "\n")] = '\0';
+        //check for staff log in
+            while(feof(s)==0){
+                fgets(user_file ,USERNAME , s);
+                user_file[strcspn(user_file, "\n")] = '\0';
 
-            if(strcmp(user_file , user_input) == 0){
-                printf("Password: ");
-                hidepass(pass_input);
-                fgets(pass_file , PASSWORD , s);
-                pass_file[strcspn(pass_file, "\n")] = '\0';
+                if(strcmp(user_file , user_input) == 0){
+                    chance = 3 ;//limit for password chances
+                    while(chance > 0){
+                        printf("Password:");
+                        hidepass(pass_input);
+                        fgets(pass_file , PASSWORD , s);
+                        pass_file[strcspn(pass_file, "\n")] = '\0';
 
-                if(strcmp(pass_file , pass_input) == 0){
-                    printf("~Login successfully as staff~\n");
-                    fclose(s);
-                    return 2 ;
-                }else{
-                    printf("The password is incorrect!");
-                    fclose(s);
+                        if(strcmp(pass_file , pass_input) == 0){
+                            printf("\n~Login successfully as staff~\n");
+                            fclose(s);
+                            return 2 ;
+                        }else{
+                            chance-- ;
+                            if(chance > 0){
+                                printf("\nWrong password!\nYou have %d more chances,try again!" , chance);
+                                hidepass(pass_input);
+                            }else{
+                                printf("\nToo many wrong passwords!\nThe program will be closed soon...");
+                                fclose(s);
+                                Sleep(3000);
+                                system("cls");
+                                exit(1);
+                            }
+                        }
+                    }
                 }
-             }
-           }
-           while(feof(m)==0){
-            fgets(user_file , USERNAME , m);
-            user_file[strcspn(user_file, "\n")] = '\0';
+            }
+        }
+        //check for member log in
+        m = fopen(MEMFILE , "r");
+        if(m == NULL){
+            printf("The members file has not found!\nReturning to main menu...");
+            Sleep(4000);
+            exitpro();
+        }else{
+            while(feof(m)==0){
+                fgets(user_file , USERNAME , m);
+                user_file[strcspn(user_file, "\n")] = '\0';
 
             if(strcmp(user_file , user_input)==0){
-                printf("Password: ");
+                chance = 3 ;
+                while(chance > 0){
+                printf("Password:");
                 hidepass(pass_input);
                 fgets(pass_file , PASSWORD , m);
                 pass_file[strcspn(pass_file, "\n")] = '\0';
 
-                if(strcmp(pass_file , pass_input)==0){
-                    printf("~Login successfully as member~\n");
-                    fclose(m);
-                    return 3;
-                }else{
-                    printf("The password is incorrect!");
-                    fclose(m);
+                    if(strcmp(pass_file , pass_input)==0){
+                        printf("\n~Login successfully as member~\n");
+                        fclose(m);
+                        return 3;
+                    }else{
+                        chance-- ;
+                        if(chance > 0){
+                            printf("\nWrong password!\nYou have %d more chances,try again!" , chance);
+                            hidepass(pass_input);
+                        }else{
+                            printf("\nToo many wrong passwords!\nThe program will be closed soon...");
+                            fclose(s);
+                            Sleep(3000);
+                            system("cls");
+                            exit(1);
+                        }
+                    }
                 }
             }
-
-           }
         }
-
     }
 }
-void hidepass(char pass[PASSWORD]) {
+
+void hidepass(char pass[PASSWORD])
+{
     char ch;
     int i = 0;
-    while (1) {
+    while(1){
         ch = getch();
-        if (ch == '\r') { // Enter
+        if(ch == '\r') { // Enter
             break;
-        } else if (ch == '\b') { // Backspace
-            if (i > 0) {
-                i--;
-                printf("\b \b");
-            }
-        } else if (i < PASSWORD - 1) {
-            pass[i++] = ch;
-            printf("*");
+        }else if(ch == '\b'){
+                if (i > 0){
+                    i--;
+                    printf("\b \b");
+                }
+        }else if(i < PASSWORD - 1){
+                pass[i++] = ch;
+                printf("*");
         }
     }
     pass[i] = '\0';

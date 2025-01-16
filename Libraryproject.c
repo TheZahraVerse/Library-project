@@ -47,7 +47,7 @@ struct employee
     char pass_emp[16];
     char name[20];
     char family[20];
-    char join_date[10];
+    char join_date_e[10];
     char phone[10];
     char id_emp[20];
     char email[40];
@@ -61,7 +61,7 @@ struct member
     char pass_mem[16];
     char name[20];
     char family[20];
-    char join_date[10];
+    char join_date_m[10];
     char validate[10];
     char phone[10];
     char id_mem[20];
@@ -265,7 +265,7 @@ void newEmp(struct employee *x)
         scanf(" %s" , x->id_emp);//issue in saving id
 
         printf("Join date(dd/mm/yyyy):");
-        scanf(" %s" , x->join_date);
+        scanf(" %s" , x->join_date_e);
 
         printf("Phone number:");
         scanf(" %s" , x->phone);
@@ -284,7 +284,7 @@ void newEmp(struct employee *x)
         fprintf(f , "%s\n" , x->username_emp);
         fprintf(f , "%s\n" , x->pass_emp);
         fprintf(f , "%s\n" , x->id_emp);
-        fprintf(f , "%s\n" , x->join_date);
+        fprintf(f , "%s\n" , x->join_date_e);
         fprintf(f , "%s\n" , x->name);
         fprintf(f , "%s\n" , x->family);
         fprintf(f , "%s\n" , x->phone);
@@ -320,7 +320,7 @@ void staffList(struct employee *x)
         fscanf(f , "%s\n" , x->username_emp);
         fscanf(f , "%s\n" , x->pass_emp);
         fscanf(f , "%s\n" , x->id_emp);
-        fscanf(f , "%s\n" , x->join_date);
+        fscanf(f , "%s\n" , x->join_date_e);
         fscanf(f , "%s\n" , x->name);
         fscanf(f , "%s\n" , x->family);
         fscanf(f , "%s\n" , x->phone);
@@ -334,7 +334,7 @@ void staffList(struct employee *x)
         printf("|ID number    :  %s\n" , x->id_emp);
         printf("|Phone number :  %s\n" , x->phone);
         printf("|E-mail       :  %s\n" , x->email);
-        printf("|Join date    :  %s\n" , x->join_date);
+        printf("|Join date    :  %s\n" , x->join_date_e);
         printf("|Username     :  %s\n" , x->username_emp);
         printf("|Password     :  %s\n" , x->pass_emp);
         puts("______________________________________");
@@ -415,7 +415,7 @@ int staffMenu()
     return isvalid ;
 }
 //.....................................................new member
-void newMem()
+void newMem(struct member *x)
 {
     FILE *m ;
     m = fopen(MEMFILE , "a");
@@ -426,7 +426,62 @@ void newMem()
         staffMenu();
     }
     else{
+        puts("~New member information:");
+        printf("First name:");
+        scanf(" %s" , x->name);
 
+        printf("Last name:");
+        scanf(" %s" , x->family);
+
+        printf("ID number:");
+        scanf(" %s" , x->id_mem);
+
+        printf("Join date:");
+        scanf(" %s" , x->join_date_m);
+
+        printf("Phone number:");
+        scanf(" %s" , x->phone);
+
+        printf("E-mail:");
+        scanf(" %s" , x->email);
+
+        printf("Username:");
+        scanf(" %s" , x->username_mem);
+
+        printf("Password:");
+        scanf(" %s" , x->pass_mem);
+
+        printf("Validate:");
+        scanf(" %s" , x->validate);
+
+        //add info to the file by this sort
+        fputs("\n" , m);
+        fputs(x->username_mem , m);//issue print diff char
+        fputs("\n" , m);
+        fputs(x->pass_mem , m);
+        fputs("\n" , m);
+        fputs(x->validate , m);
+        fputs("\n" , m);
+        fputs(x->id_mem , m);
+        fputs("\n" , m);
+        fputs(x->join_date_m , m);
+        fputs("\n" , m);
+        fputs(x->name , m);
+        fputs("\n" , m);
+        fputs(x->family , m);
+        fputs("\n" , m);
+        fputs(x->phone , m);
+        fputs("\n" , m);
+        fputs(x->email , m);
+
+        //if the conditions worked out , you can write a better massage
+        printf("New member added successfully.\nPress any key to return to staff menu:");
+        fclose(m);
+        getche();
+        printf("\n\nReturning to staff menu...");
+        Sleep(3000);
+        system("cls");
+        staffMenu();//issue to choose again
     }
 
 }

@@ -26,7 +26,7 @@ void rmEmp();
 void report_ad();
 //staff Functions
 int staffMenu();//done
-void newMem();
+void newMem();//done
 void revival();
 void generalList();
 void rmMem();
@@ -79,7 +79,7 @@ void main()
     m = start_m ;
     //Start the menu as first wall
     int select_user = menu();
-    int who = Login();
+    int who = Login(select_user);//add
     //not entered
     if(who == 0)
         select_user = 0 ;
@@ -129,11 +129,9 @@ void main()
     {
     case 1 :
         newEmp(e);
-        e = e->link ;
         break;
     case 2 :
         staffList(e);
-        e = e->link ;
         break;
     case 3 :
         rmEmp();
@@ -216,7 +214,7 @@ int adminMenu()
         ch = choice[0];
     }
     else{
-        ch = '6' ;
+        ch = '\0' ;
     }
         switch(ch)
         {
@@ -234,8 +232,9 @@ int adminMenu()
             break;
         case '5':
             exitpro();
+            return 0 ;
             break;
-        case '6' :
+        default :
             repeat();
             break;
         }
@@ -409,6 +408,9 @@ int staffMenu()
             case '8':
                 exitpro();
                 break;
+            default :
+                repeat();//Issue here to repeat
+                break;
         }
 
     }while( isvalid == 0);
@@ -455,7 +457,7 @@ void newMem(struct member *x)
         scanf(" %s" , x->validate);
 
         //add info to the file by this sort
-        fputs("\n" , m);
+
         fputs(x->username_mem , m);//issue print diff char
         fputs("\n" , m);
         fputs(x->pass_mem , m);
@@ -529,8 +531,8 @@ int memberMenu()
     puts("|4. Available books in library");
     puts("|5. Account setting");
     puts("|6. Logout and return to main menu");
-    printf("Please enter your choice:");
-    scanf(" %s" , &choice);
+    printf("/nPlease enter your choice:");
+    scanf(" %3s" , &choice);
     if( isdigit(choice[0]) && choice[1]=='\0'){
         ch = choice[0];
     }
@@ -554,6 +556,9 @@ int memberMenu()
             break;
         case '6' :
             exitpro();
+            break;
+        default :
+            repeat();
             break;
         }
     }while(isvalid == 0);
@@ -585,7 +590,7 @@ void setting_mem()
 
 }
 //                               *GENERAL SECTION*
-//...................................................Main menu managemanet
+//...................................................Main menu management
 int menu()
 {
     char choice[100];
@@ -602,6 +607,8 @@ int menu()
         scanf(" %s" , &choice);
         if( isdigit(choice[0]) && choice[1]=='\0'){
             ch = choice[0];
+        }else{
+            ch = '\0' ;
         }
            switch (ch)
            {
@@ -619,9 +626,8 @@ int menu()
                    exitpro();
                    break;
            default :
-               if(isvalid == 0){
                    repeat();
-               }
+                   break;
             }
 
     }while( isvalid == 0);
@@ -632,7 +638,6 @@ int menu()
 //......................................................Repeat
 void repeat()
 {   char x ;
-    printf("~Your input is not valid\n");
     printf("Enter any key to start again:");
     x = getche();
     system("cls");
@@ -657,20 +662,21 @@ void exitpro()
     }
 }
 //......................................................log in
-int Login()//input for user selection
+int Login(int selection)//input for user selection
 {
     printf("Log in process... \n");
     char user_input[USERNAME];
     char pass_input[PASSWORD];
     char ch ;
     int i , chance = 3;//the numbers to try your password chance
+    int found ;
     //excited usernames and passwords reads from files
     char user_file[USERNAME];
     char pass_file[PASSWORD];
     printf("Username:");
     scanf(" %s" , user_input);
     //check the input username character
-
+    while(selection == 1){
         if(strcmp(user_input , ADMIN_USERNAME) == 0){
             printf("Password:");//add stars to avoid showing password
             while(chance > 0){
@@ -678,6 +684,7 @@ int Login()//input for user selection
                 if(strcmp(pass_input , ADMIN_PASS) == 0){
                     printf("\n~Login successfully as admin~\n");
                     printf("\n");
+                    found = 1 ;
                     return 1 ;
                 }
                 else{
@@ -696,9 +703,13 @@ int Login()//input for user selection
                 }
             }
         }
-
+    }
+        if(found == 0){
+            printf("Wrong username for admin!\n");
+            return 0 ;
+        }
+    while(selection == 2){
         FILE *s , *m ;
-
         s = fopen(EMPFILE , "r");
         if(s == NULL){
             printf("The staff file has not found!\nReturning to main menu...");
@@ -707,6 +718,7 @@ int Login()//input for user selection
         }
         else{
         //check for staff log in
+        found = 0 ;
             while(feof(s)==0){
                 fgets(user_file ,USERNAME , s);
                 user_file[strcspn(user_file, "\n")] = '\0';
@@ -721,6 +733,7 @@ int Login()//input for user selection
 
                         if(strcmp(pass_file , pass_input) == 0){
                             printf("\n~Login successfully as staff~\n");
+                            found = 1 ;
                             fclose(s);
                             return 2 ;
                         }else{
@@ -737,9 +750,16 @@ int Login()//input for user selection
                             }
                         }
                     }
+
                 }
             }
+            if(found == 0){
+                printf("Employee not found!\n");
+                return 0 ;
+            }
         }
+    }
+    while(selection == 3){
         //check for member log in
         m = fopen(MEMFILE , "r");
         if(m == NULL){
@@ -747,6 +767,7 @@ int Login()//input for user selection
             Sleep(4000);
             exitpro();
         }else{
+            found = 0;
             while(feof(m)==0){
                 fgets(user_file , USERNAME , m);
                 user_file[strcspn(user_file, "\n")] = '\0';
@@ -761,6 +782,7 @@ int Login()//input for user selection
 
                     if(strcmp(pass_file , pass_input)==0){
                         printf("\n~Login successfully as member~\n");
+                        found = 1;
                         fclose(m);
                         return 3;
                     }else{
@@ -770,16 +792,23 @@ int Login()//input for user selection
                             hidepass(pass_input);
                         }else{
                             printf("\nToo many wrong passwords!\nThe program will be closed soon...");
-                            fclose(s);
+                            fclose(m);
                             Sleep(3000);
                             system("cls");
                             exit(1);
                         }
                     }
                 }
-            }
+
+            }else
+               found = 0;
+        }
+        if(found == 0){
+            printf("Member not found!\n");
+            return 0 ;
         }
     }
+  }
 }
 
 void hidepass(char pass[PASSWORD])

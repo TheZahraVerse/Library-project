@@ -14,7 +14,7 @@
 //..........................................Functions
 //General Functions
 int menu();//done
-int Login();//50 - 50//there is a problem in process
+int Login();//solved
 void hidepass(char pass[PASSWORD]);//done
 void repeat();//done
 void exitpro();//done
@@ -77,40 +77,47 @@ void main()
     e = start_e ;
     start_m = malloc(sizeof(struct member));
     m = start_m ;
-    //Start the menu as first wall
-    int select_user = menu();
-    int who = Login(select_user);//add
-    //not entered
-    if(who == 0)
-        select_user = 0 ;
-    int confirmed;
+    int select_user , who , confirmed = 0;
     //selection of each characters
     int admin_se ;
     int staff_se;
     int member_se;
-    //call the functions by checking the selection
-    switch(select_user)
-    {
-    case 0 ://Issue in repeating the menu again
-        repeat();
-        menu();
-        break;
-    case 1 :
-        if(who == 1){
-            confirmed = 1;
-         }
-        break;
-    case 2 :
-        if(who == 2){
-            confirmed = 2;
+   //Start the menu as first wall
+   while(1){//to repeat the menu//done
+        select_user = menu();
+        if(select_user == 4){
+            continue;
         }
-        break ;
-    case 3 :
-        if(who == 3){
-            confirmed = 3;
+        who = Login(select_user);//add
+        //not entered
+        if(who == 0){
+            select_user = 0 ;
         }
-        break;
-    }
+        //call the functions by checking the selection
+        switch(select_user)
+        {
+        case 1 :
+            if(who == 1){
+                confirmed = 1;
+            }
+            break;
+        case 2 :
+            if(who == 2){
+                confirmed = 2;
+            }
+            break ;
+        case 3 :
+            if(who == 3){
+                confirmed = 3;
+            }
+        default :
+            printf("\nTry again\n");
+            repeat();
+            continue;
+        }
+        if(confirmed != 0)
+            break;
+   }
     /*for those who are confirmed and their menu is open
     get their selection*/
     switch(confirmed)
@@ -145,6 +152,7 @@ void main()
         break;
     }
     //staff made their choices
+    while(1){
     switch(staff_se)
     {
     case 1 :
@@ -168,6 +176,10 @@ void main()
     case 7 :
         setting_emp();
         break;
+    case 8 :
+        exitpro();
+        continue;
+        }
     }
     //Member made her choice
     switch(member_se)
@@ -236,6 +248,7 @@ int adminMenu()
             break;
         default :
             repeat();
+            adminMenu();
             break;
         }
     }while(isvalid == 0);
@@ -419,6 +432,12 @@ int staffMenu()
 //.....................................................new member
 void newMem(struct member *x)
 {
+    //using strcpy to work with str in function
+
+
+
+
+    char user[20];
     FILE *m ;
     m = fopen(MEMFILE , "a");
     if(m == NULL){
@@ -448,7 +467,8 @@ void newMem(struct member *x)
         scanf(" %s" , x->email);
 
         printf("Username:");
-        scanf(" %s" , x->username_mem);
+        scanf(" %s" , &user);
+        user[strlen(user)]='\0';
 
         printf("Password:");
         scanf(" %s" , x->pass_mem);
@@ -458,7 +478,7 @@ void newMem(struct member *x)
 
         //add info to the file by this sort
 
-        fputs(x->username_mem , m);//issue print diff char
+        fputs(user, m);//issue print diff char
         fputs("\n" , m);
         fputs(x->pass_mem , m);
         fputs("\n" , m);
@@ -493,10 +513,56 @@ void revival()
 
 }
 //......................................................general list of every member
-void generalList()
+void generalList(struct member *x)
 {
-
+    printf("\n~You are watching the list of Members~\n");
+    puts("______________________________________");
+    FILE *f ;
+    f = fopen(MEMFILE , "r");
+    if(f == NULL){
+        printf("The member's file has not found!\n");
+        Sleep(4000);
+        system("cls");
+        staffMenu();
+    }
+    else{
+        int empcount = 1 ;
+        while(feof(f)== 0){
+            fscanf(f , "%s\n" , x->username_mem);
+            fscanf(f , "%s\n" , x->pass_mem);
+            fscanf(f , "%s\n" , x->id_mem);
+            fscanf(f , "%s\n" , x->join_date_m);
+            fscanf(f , "%s\n" , x->name);
+            fscanf(f , "%s\n" , x->family);
+            fscanf(f , "%s\n" , x->phone);
+            fscanf(f , "%s\n" , x->email);
+            if(x->username_mem == EOF)
+                break;
+            //show the list
+            printf("|~~Employee No.%d~~\n" , empcount++);
+            printf("|First name   :  %s\n" , x->name);
+            printf("|Last name    :  %s\n" , x->family);
+            printf("|ID number    :  %s\n" , x->id_mem);
+            printf("|Phone number :  %s\n" , x->phone);
+            printf("|E-mail       :  %s\n" , x->email);
+            printf("|Join date    :  %s\n" , x->join_date_m);
+            printf("|Username     :  %s\n" , x->username_mem);
+            printf("|Password     :  %s\n" , x->pass_mem);
+            puts("______________________________________");
+            }
+            if(empcount == 1)
+                printf("No staff data found!");
+        }
+        fclose(f);
+        printf("Press any key to return to admin menu:");
+        getche();
+        printf("\n\nReturning to admin menu...");
+        Sleep(3000);
+        system("cls");
+        adminMenu();//issue to choose again*/
 }
+
+
 //......................................................remove members
 void rmMem()
 {
@@ -626,6 +692,7 @@ int menu()
                    exitpro();
                    break;
            default :
+                   printf("\n~Your input is not valid!\n");
                    repeat();
                    break;
             }
@@ -637,9 +704,9 @@ int menu()
 }
 //......................................................Repeat
 void repeat()
-{   char x ;
+{
     printf("Enter any key to start again:");
-    x = getche();
+    getche();
     system("cls");
 }
 //.....................................................exit
@@ -648,17 +715,16 @@ void exitpro()
     int x ;
     printf("~Are you sure you want to exit?   | 1.Yes  / 2.No | : ");
     scanf(" %d" , &x);
-    while( x == 1){
+    if( x == 1){
         printf("Exiting the program....");
         Sleep(3000);
         system("cls");
         exit(1);
     }
-    while(x == 2){
+    else if(x == 2){
         printf("Returning to main menu....");
         Sleep(3000);
         system("cls");
-        menu();
     }
 }
 //......................................................log in

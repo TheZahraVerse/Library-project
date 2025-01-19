@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <windows.h>
 #include <conio.h>
+#include <time.h>
 //define sizes
 #define USERNAME 16
 #define PASSWORD 20
@@ -11,6 +12,7 @@
 #define ADMIN_PASS "123"
 #define EMPFILE "Staffprofile.txt"
 #define MEMFILE "Membersprofile.txt"
+#define GBOOKFILE "Generalbooks.txt"
 //..........................................Functions
 //General Functions
 int menu();//done
@@ -70,6 +72,18 @@ struct member
     struct member *link ;
 };
 struct member *start_m  , *m;
+//Books structure
+struct book
+{
+    char name[50];
+    char publication[20];
+    char writer[50];
+    char year[4];
+    char reg_date[10];//automatic
+    char id_book[10];
+    char id_register[10];
+};
+struct book *start_b , *b ;
 
 //*******************************************...Main
 void main()
@@ -502,7 +516,7 @@ void newMem(struct member *x)
             //get input
             scanf(" %s" , temp);
             //copy in pointer address to put file later
-            strcpy(x->name , temp);//issue
+            strcpy(x->name , temp);
 
             printf("Last name:");
             scanf(" %s" , temp);
@@ -642,8 +656,79 @@ void rmMem()
 
 }
 //......................................................books registering
-void bookRegister()
+void bookRegister(struct book *x)
 {
+    char temp[50] , user[10];
+    int num , id;
+    printf("~Enter your username :");//consider it valid
+    scanf(" %s" , user);
+    printf("\n~How many books you want to add ? :");
+    scanf(" %d" , &num);
+    FILE *f ;
+    f = fopen(GBOOKFILE , "a");
+    if(f == NULL){
+        printf("\nCould not found the file of books!\n");
+        repeat();
+        return;
+    }
+    else{
+        for(int i = 0 ; i < num ; i++){
+            puts("\n_______________________________________");
+            printf("~Add information (book %d of %d):\n" , i+1 , num);
+            printf("Name of the book :");
+            //get input
+            scanf(" %s" , temp);//use '_' to separate words
+            //copy temp to save it to file later
+            strcpy(x->name , temp);
+
+            printf("The publication :");
+            scanf(" %s" , temp);
+            strcpy(x->publication , temp);
+
+            printf("Name of the writer :");
+            scanf(" %s" , temp);
+            strcpy(x->writer , temp);
+
+            printf("Year of publication :");
+            scanf(" %s" , temp);
+            strcpy(x->year , temp);
+
+            printf("Date of registration :");//automatic later
+            scanf(" %s" , temp);
+            strcpy(x->reg_date , temp);
+
+            //get a random number for id
+            id = rand();
+            //convert to string
+            itoa(id , temp , 10);
+            strcpy(x->id_book , temp);
+
+            //specify the register employee
+            strcpy(x->id_register , user);
+
+            //add information in file
+            fputs(x->name , f);
+            fputs("\n" , f);
+            fputs(x->writer , f);
+            fputs("\n" , f);
+            fputs(x->publication , f);
+            fputs("\n" , f);
+            fputs(x->id_book , f);
+            fputs("\n" , f);
+            fputs(x->year , f);
+            fputs("\n" , f);
+            fputs(x->reg_date , f);//same issue in file
+            fputs("\n" , f);
+            fputs(x->id_register , f);
+            fputs("\n" , f);
+
+            printf("\n~New book added successfully.\n");
+        }
+        fclose(f);
+        printf("\n~All books successfully saved by '%s'\n" , user);
+        printf("Press any key to return to staff menu:");//issue
+        getche();
+    }
 
 }
 //.......................................................report for employees

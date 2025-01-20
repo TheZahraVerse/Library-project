@@ -19,6 +19,7 @@ int menu();//done
 int Login();//solved
 void hidepass(char pass[PASSWORD]);//done
 int validusername(char user[10]);
+int validphone(char phone[10]);
 void repeat();//done
 void exitpro();//done
 //Admin Functions
@@ -88,10 +89,6 @@ struct book *start_b , *b ;
 //*******************************************...Main
 void main()
 {
-    start_e = malloc(sizeof(struct employee));
-    e = start_e ;
-    start_m = malloc(sizeof(struct member));
-    m = start_m ;
     int select_user , who , confirmed = 0;
     //selection of each characters
     int admin_se ;
@@ -107,6 +104,9 @@ void main()
         //not entered
         if(who == 0){
             select_user = 0 ;
+            printf("\n");
+            repeat();
+            system("cls");
         }
         //call the functions by checking the selection
         switch(select_user)
@@ -125,10 +125,6 @@ void main()
             if(who == 3){
                 confirmed = 3;
             }
-        default :
-            printf("\nTry again\n");
-            repeat();
-            continue;
         }
         if(confirmed != 0)
             break;
@@ -149,6 +145,9 @@ void main()
     //admin made her choice
     switch(admin_se)
     {
+    case 0 :
+        menu();
+        break;
     case 1 :
         newEmp(e);
         break;
@@ -167,47 +166,34 @@ void main()
         break;
     }
     //staff made their choices
-    int done = 0;
-    while(1){
         switch(staff_se)
         {
         case 1 :
             newMem(m);
-            done = 1 ;
             break;
         case 2 :
             revival();
-            done = 2;
             break;
         case 3 :
             generalList();
-            done = 3;
             break;
         case 4 :
             rmMem();
-            done = 4 ;
             break;
         case 5 :
             bookRegister();
-            done = 5;
             break;
         case 6 :
             report_emp();
-            done = 6;
             break;
         case 7 :
             setting_emp();
-            done = 7;
             break;
         case 8 :
             exitpro();
-            continue;
-        default :
-            continue;
-        }
-        if(done != 0)
             break;
-    }
+        }
+
     //Member made her choice
     switch(member_se)
     {
@@ -242,7 +228,7 @@ int adminMenu()
     do{
     puts("******/Welcome Admin/*******");
     puts("~You are in Admin menu\n______________________________________");
-    puts("|1. New employee  registration");
+    puts("|1. New employee registration");
     puts("|2. View the list of staff");
     puts("|3. Remove the employee from the system");
     puts("|4. Reports");
@@ -275,7 +261,6 @@ int adminMenu()
             break;
         default :
             repeat();
-            adminMenu();
             break;
         }
     }while(isvalid == 0);
@@ -300,7 +285,7 @@ void newEmp(struct employee *x)
         int count = 0;
         for(int i = 0 ; i < num ; i++){
             puts("______________________________________");
-            printf("~Add informations(Employee %d of %d):\n" , i+1 , num);
+            printf("~Add information(Employee %d of %d):\n" , i+1 , num);
             printf("First name:");
             //get input
             scanf(" %s" , temp);
@@ -319,10 +304,18 @@ void newEmp(struct employee *x)
             scanf(" %s" , temp);
             strcpy(x->join_date_e , temp);
 
+       while(1){
             printf("Phone number:");
             scanf(" %s" , temp);
-            strcpy(x->phone , temp);
-
+            if(validphone(temp) == 0){
+                puts("\nTry again!");
+                repeat();
+                continue;
+            }else{
+                strcpy(x->phone , temp);
+                break;
+            }
+       }
             printf("E-mail:");
             scanf(" %s" , temp);
             strcpy(x->email , temp);
@@ -458,6 +451,9 @@ int staffMenu()
     if( isdigit(choice[0]) && choice[1]=='\0'){
         ch = choice[0];
     }
+    else{
+        ch = '\0' ;
+    }
     do{
         switch(ch)
         {
@@ -485,8 +481,10 @@ int staffMenu()
                 exitpro();
                 break;
             default :
-                repeat();//Issue here to repeat
-                break;
+                   printf("\n~Your input is not valid!\n");
+                   repeat();
+                   system("cls");
+                   break;
         }
 
     }while( isvalid == 0);
@@ -530,10 +528,18 @@ void newMem(struct member *x)
             scanf(" %s" , temp);
             strcpy(x->join_date_m , temp);
 
+        while(1){
             printf("Phone number:");
             scanf(" %s" , temp);
-            strcpy(x->phone , temp);
-
+            if(validphone(temp) == 0){
+                puts("\nTry again!");
+                repeat();
+                continue;
+            }else{
+                strcpy(x->phone , temp);
+                break;
+            }
+        }
             printf("E-mail:");
             scanf(" %s" , temp);
             strcpy(x->email , temp);
@@ -747,7 +753,7 @@ int memberMenu()
 {
     char choice[100] , ch ;
     int isvalid = 0;
-    puts("*******welcome member*******");
+    puts("\n*******Welcome member*******");
     puts("~You are in Member menu\n_____________________________");
     puts("|1. Borrow new books");
     puts("|2. Write-in returns");
@@ -755,7 +761,7 @@ int memberMenu()
     puts("|4. Available books in library");
     puts("|5. Account setting");
     puts("|6. Logout and return to main menu");
-    printf("/nPlease enter your choice:");
+    printf("\nPlease enter your choice:");
     scanf(" %3s" , &choice);
     if( isdigit(choice[0]) && choice[1]=='\0'){
         ch = choice[0];
@@ -852,6 +858,7 @@ int menu()
            default :
                    printf("\n~Your input is not valid!\n");
                    repeat();
+                   system("cls");
                    break;
             }
 
@@ -865,7 +872,7 @@ void repeat()
 {
     printf("Enter any key to start again:");
     getche();
-    system("cls");
+    printf("\n");
 }
 //.....................................................exit
 void exitpro()
@@ -957,8 +964,8 @@ int Login(int selection)//input for user selection
 
                 if(strcmp(user_file , user_input) == 0){
                     chance = 3 ;//limit for password chances
-                    while(chance > 0){
-                        printf("Password:");
+                    printf("Password:");
+                    while(chance > 0){   //.......................Issue in repeating password
                         hidepass(pass_input);
                         fgets(pass_file , PASSWORD , s);
                         pass_file[strcspn(pass_file, "\n")] = '\0';
@@ -972,6 +979,7 @@ int Login(int selection)//input for user selection
                             chance-- ;
                             if(chance > 0){
                                 printf("\nWrong password!\nYou have %d more chances,try again!" , chance);
+                                printf("\nPassword:");
                                 hidepass(pass_input);
                             }else{
                                 printf("\nToo many wrong passwords!\nThe program will be closed soon...");
@@ -1006,8 +1014,8 @@ int Login(int selection)//input for user selection
 
             if(strcmp(user_file , user_input)==0){
                 chance = 3 ;
-                while(chance > 0){
                 printf("Password:");
+                while(chance > 0){
                 hidepass(pass_input);
                 fgets(pass_file , PASSWORD , m);
                 pass_file[strcspn(pass_file, "\n")] = '\0';
@@ -1021,6 +1029,7 @@ int Login(int selection)//input for user selection
                         chance-- ;
                         if(chance > 0){
                             printf("\nWrong password!\nYou have %d more chances,try again!" , chance);
+                            printf("\nPassword:");
                             hidepass(pass_input);
                         }else{
                             printf("\nToo many wrong passwords!\nThe program will be closed soon...");
@@ -1050,7 +1059,7 @@ void hidepass(char pass[PASSWORD])
     int i = 0;
     while(1){
         ch = getch();
-        if(ch == '\r') { // Enter
+        if(ch == '\r') {
             break;
         }else if(ch == '\b'){
                 if (i > 0){
@@ -1090,6 +1099,30 @@ int validusername(char user[10])
         }//valid username
         return 1 ;
     }
+}
+int validphone(char phone[10])
+{
+    int len = strlen(phone);//size of phone number without 09
+    int count = 0 ;
+    if( len != 9 ){
+        printf("\n~Phone number must have exactly 11 digits!\n");
+        return 0 ;//not valid
+    }
+    else{
+        for(int i = 0 ; i < len ; i++){
+            if(!isdigit(phone[i]) ){//only digits
+                printf("\n~Phone number is not valid,Use digits only!\n");
+                return 0 ;//not valid
+                break;
+            }
+            else{
+                count++ ;
+            }
+        }
+        if(count == 9)//all of the characters are valid
+            return 1 ;
+    }
+
 }
 
 

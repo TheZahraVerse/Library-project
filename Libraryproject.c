@@ -20,6 +20,7 @@ int Login();//solved
 void hidepass(char pass[PASSWORD]);//done
 int validusername(char user[10]);
 int validphone(char phone[10]);
+int validname(char name[20]);
 void repeat();//done
 void exitpro();//done
 //Admin Functions
@@ -95,7 +96,7 @@ void main()
     int staff_se;
     int member_se;
    //Start the menu as first wall
-   while(1){//to repeat the menu//done
+   do{//to repeat the menu//done
         select_user = menu();
         if(select_user == 4){
             continue;
@@ -128,7 +129,7 @@ void main()
         }
         if(confirmed != 0)
             break;
-   }
+   }while(1);
     /*for those who are confirmed and their menu is open
     get their selection*/
     switch(confirmed)
@@ -286,16 +287,35 @@ void newEmp(struct employee *x)
         for(int i = 0 ; i < num ; i++){
             puts("______________________________________");
             printf("~Add information(Employee %d of %d):\n" , i+1 , num);
+        while(1){
             printf("First name:");
             //get input
             scanf(" %s" , temp);
-            //copy in pointer address to put file later
-            strcpy(x->name , temp);//issue
+            if( validname(temp) == 0){
+                puts("\nTry again!");
+                repeat();
+                continue;
+            }
+            else{
+                //copy in pointer address to put file later
+                strcpy(x->name , temp);//issue
+                break;
+            }
+        }
 
+        while(1){
             printf("Last name:");
             scanf(" %s" , temp);
-            strcpy(x->family , temp);
-
+            if( validname(temp) == 0){
+                puts("\nTry again!");
+                repeat();
+                continue;
+            }
+            else{
+                strcpy(x->family , temp);
+                break;
+            }
+        }
             printf("ID number:");
             scanf(" %s" , temp);
             strcpy(x->id_emp , temp);
@@ -513,13 +533,37 @@ void newMem(struct member *x)
             printf("First name:");
             //get input
             scanf(" %s" , temp);
+        while(1){
+            printf("First name:");
+            //get input
+            scanf(" %s" , temp);
+            if( validname(temp) == 0){
+                puts("\nTry again!");
+                repeat();
+                continue;
+            }
+            else{
+                //copy in pointer address to put file later
+                strcpy(x->name , temp);
+                break;
+            }
             //copy in pointer address to put file later
             strcpy(x->name , temp);
+        }
 
+        while(1){
             printf("Last name:");
             scanf(" %s" , temp);
-            strcpy(x->family , temp);
-
+            if( validname(temp) == 0){
+                puts("\nTry again!");
+                repeat();
+                continue;
+            }
+            else{
+                strcpy(x->family , temp);
+                break;
+            }
+        }
             printf("ID number:");
             scanf(" %s" , temp);
             strcpy(x->id_mem , temp);
@@ -1123,6 +1167,28 @@ int validphone(char phone[10])
             return 1 ;
     }
 
+}
+int validname(char name[20])
+{
+    int len = strlen(name);
+    int count = 0 ;
+    if(len < 4 || len > 20 ){
+        printf("\n~Name must be between 4 and 20 characters!\n");
+        return 0 ;
+    }
+    else{
+        for(int i = 0 ; i < len ; i++){
+            if( !isalpha(name[i]) ){
+                printf("\n~Invalid name , Use only alphabetical characters!\n");
+                return 0 ;
+            }
+            else
+                count++ ;
+        }
+        if(count == len){
+            return 1 ;
+        }
+    }
 }
 
 

@@ -21,6 +21,7 @@ void hidepass(char pass[PASSWORD]);//done
 int validusername(char user[10]);
 int validphone(char phone[10]);
 int validname(char name[20]);
+int validID(char ID[10]);
 void repeat();//done
 void exitpro();//done
 //Admin Functions
@@ -316,10 +317,20 @@ void newEmp(struct employee *x)
                 break;
             }
         }
+
+        while(1){
             printf("ID number:");
             scanf(" %s" , temp);
-            strcpy(x->id_emp , temp);
-
+            if( validID(temp) == 0){
+                puts("\nTry again!");
+                repeat();
+                continue;
+            }
+            else{
+                strcpy(x->id_emp , temp);
+                break;
+            }
+        }
             printf("Join date:");
             scanf(" %s" , temp);
             strcpy(x->join_date_e , temp);
@@ -564,10 +575,19 @@ void newMem(struct member *x)
                 break;
             }
         }
+        while(1){
             printf("ID number:");
             scanf(" %s" , temp);
-            strcpy(x->id_mem , temp);
-
+            if( validID(temp) == 0){
+                puts("\nTry again!");
+                repeat();
+                continue;
+            }
+            else{
+                strcpy(x->id_mem , temp);
+                break;
+            }
+        }
             printf("Join date:");
             scanf(" %s" , temp);
             strcpy(x->join_date_m , temp);
@@ -1190,5 +1210,27 @@ int validname(char name[20])
         }
     }
 }
-
+int validID(char ID[10])
+{
+    int count = 0;
+    int len = strlen(ID);
+    if( len != 10 ){
+        printf("\n~ID must have 10 digits!\n");
+        return 0 ;
+    }
+    else{
+        for(int i = 0 ; i < len ; i++){
+            if( !isdigit(ID[i]) ){
+                printf("\n~Invalid ID(unknown characters for ID) , Use digits only!\n");
+                return 0 ;
+            }
+            else{
+                count++ ;
+            }
+        }
+        if(count == len){
+            return 1 ;
+        }
+    }
+}
 

@@ -23,7 +23,7 @@ int validphone(char phone[10]);
 int validname(char name[20]);
 int validID(char ID[10]);
 void repeat();//done
-void exitpro();//done
+int exitpro();//done
 //Admin Functions
 int adminMenu();//done
 void newEmp();//done
@@ -91,64 +91,70 @@ struct book *start_b , *b ;
 //*******************************************...Main
 void main()
 {
-    int select_user , who , confirmed = 0;
+    int select_user , who ,  step1 , step2 ;
     //selection of each characters
     int admin_se ;
     int staff_se;
     int member_se;
+    int exit ;
    //Start the menu as first wall
-   do{//to repeat the menu//done
-        select_user = menu();
-        if(select_user == 4){
-            continue;
-        }
-        who = Login(select_user);//add
-        //not entered
-        if(who == 0){
-            select_user = 0 ;
-            printf("\n");
+   while(1){//to repeat the menu//done
+         step1 = menu();
+        if(step1 == 0){
             repeat();
             system("cls");
+            continue;
         }
-        //call the functions by checking the selection
-        switch(select_user)
-        {
-        case 1 :
-            if(who == 1){
-                confirmed = 1;
-            }
-            break;
-        case 2 :
-            if(who == 2){
-                confirmed = 2;
-            }
-            break ;
-        case 3 :
-            if(who == 3){
-                confirmed = 3;
+        else if(step1 == 4){
+             exit = exitpro();
+            if(exit == 1){
+                continue;
             }
         }
-        if(confirmed != 0)
+        else{
             break;
-   }while(1);
+        }
+   }
+    //check for who is trying to log in
+    while(1){
+        step2 = Login(step1);//add
+        //not entered unsuccessful log in
+        if(step2 == 0){
+            repeat();
+            printf("\n");
+            continue;
+        }
+        else if(step2 == 5){
+            exit = exitpro();
+            if(exit == 1){
+                continue;
+            }
+        }
+        else{
+            break;
+        }
+    }
     /*for those who are confirmed and their menu is open
     get their selection*/
-    switch(confirmed)
+
+    switch(step2)
     {
     case 1 :
         admin_se = adminMenu();
-         break;
+        break;
     case 2 :
         staff_se = staffMenu();
         break;
     case 3 :
-         member_se = memberMenu();
+        member_se = memberMenu();
     }
+
     //admin made her choice
     switch(admin_se)
     {
     case 0 :
-        menu();
+        repeat();
+        system("cls");
         break;
     case 1 :
         newEmp(e);
@@ -163,42 +169,50 @@ void main()
         report_ad();
         break;
     case 5 :
-        repeat();
-        adminMenu();
-        break;
+        exit = exitpro();
+
     }
     //staff made their choices
-        switch(staff_se)
-        {
-        case 1 :
-            newMem(m);
-            break;
-        case 2 :
-            revival();
-            break;
-        case 3 :
-            generalList();
-            break;
-        case 4 :
-            rmMem();
-            break;
-        case 5 :
-            bookRegister();
-            break;
-        case 6 :
-            report_emp();
-            break;
-        case 7 :
-            setting_emp();
-            break;
-        case 8 :
-            exitpro();
-            break;
-        }
+    switch(staff_se)
+    {
+    case 0 :
+        repeat();
+        system("cls");
+        break;
+    case 1 :
+        newMem(m);
+        break;
+    case 2 :
+        revival();
+        break;
+    case 3 :
+        generalList();
+        break;
+    case 4 :
+        rmMem();
+        break;
+    case 5 :
+        bookRegister();
+        break;
+    case 6 :
+        report_emp();
+        break;
+    case 7 :
+        setting_emp();
+        break;
+    case 8 :
+        exit = exitpro();
+
+    }
 
     //Member made her choice
     switch(member_se)
     {
+    case 0 :
+        puts("\n~Your input is not valid , Use only digits for your choice!");
+        repeat();
+        system("cls");
+        break;
     case 1 :
         memNewBook();
         break;
@@ -214,6 +228,9 @@ void main()
     case 5 :
         setting_mem();
         break;
+    case 6 :
+        exit = exitpro();
+
     }
 
 
@@ -226,8 +243,7 @@ void main()
 int adminMenu()
 {
     char choice[100] , ch ;
-    int isvalid=0 ;
-    do{
+
     puts("******/Welcome Admin/*******");
     puts("~You are in Admin menu\n______________________________________");
     puts("|1. New employee registration");
@@ -236,37 +252,36 @@ int adminMenu()
     puts("|4. Reports");
     puts("|5. Logout and return to main menu\n");
     printf("Please enter your choice:");
-    scanf(" %s" , &choice);
-    if( isdigit(choice[0]) && choice[1]=='\0'){
-        ch = choice[0];
-    }
-    else{
-        ch = '\0' ;
-    }
+    scanf(" %s" , choice);
+        if( isdigit(choice[0]) && choice[1]=='\0' && (choice[0]>'0' && choice[0]<'5')){
+            ch = choice[0];
+        }
+        else{
+            ch = '\0' ;
+        }
+
         switch(ch)
         {
         case '1':
-            isvalid = 1;
+            return 1;
             break;
         case '2':
-            isvalid = 2;
+            return 2;
             break;
         case '3':
-            isvalid = 3;
+            return 3;
             break;
         case '4':
-            isvalid = 4;
+            return 4;
             break;
         case '5':
-            exitpro();
-            return 0 ;
+            return 5;
             break;
-        default :
-            repeat();
+        case '\0' :
+            puts("\n~You used invalid characters to choose , Try again!");
+            return 0;
             break;
         }
-    }while(isvalid == 0);
-    return isvalid;
 }
 //...................................................new employee
 void newEmp(struct employee *x)
@@ -465,8 +480,8 @@ void report_ad()
 int staffMenu()
 {
     char choice[100] , ch ;
-    int isvalid =0 ;
-    while(1){
+
+
     puts("******/Welcome Employee/*******");
     puts("~You are in Staff menu\n_______________________________");
     puts("|1. Sign in for new members");
@@ -479,48 +494,42 @@ int staffMenu()
     puts("|8. Logout and return to main menu\n");
     printf("Please enter your choice:");
     scanf(" %s" , choice);
-    if( isdigit(choice[0]) && choice[1]=='\0'){
+    if( isdigit(choice[0]) && choice[1]=='\0' && (choice[0]>'0' && choice[0]<'5')){
         ch = choice[0];
     }
     else{
         ch = '\0' ;
     }
-    do{
-        switch(ch)
-        {
+            switch(ch)
+            {
             case '1':
-                isvalid = 1;
+                return 1;
                  break;
             case '2':
-                isvalid = 2;
+                return 2;
                 break;
             case '3':
-                isvalid = 3;
+                return 3;
                 break;
             case '4':
-                isvalid = 4;
+                return 4;
                 break;
             case '5':
-                isvalid = 5;
+                return 5;
                 break;
             case '6':
-                isvalid = 6;
+                return 6;
                 break;
             case '7':
-                isvalid = 7;
+                return 7;
             case '8':
-                exitpro();
+                return 8;
                 break;
-            default :
-                   printf("\n~Your input is not valid!\n");
-                   repeat();
-                   system("cls");
-                   break;
-        }
-
-    }while( isvalid == 0);
-    return isvalid ;
-    }
+            case '\0':
+                puts("\n~You used invalid characters to choose , Try again!");
+                return 0;
+                break;
+            }
 }
 //.....................................................new member
 void newMem(struct member *x)
@@ -816,7 +825,7 @@ void setting_emp()
 int memberMenu()
 {
     char choice[100] , ch ;
-    int isvalid = 0;
+
     puts("\n*******Welcome member*******");
     puts("~You are in Member menu\n_____________________________");
     puts("|1. Borrow new books");
@@ -827,36 +836,37 @@ int memberMenu()
     puts("|6. Logout and return to main menu");
     printf("\nPlease enter your choice:");
     scanf(" %3s" , &choice);
-    if( isdigit(choice[0]) && choice[1]=='\0'){
+    if( isdigit(choice[0]) && choice[1]=='\0' && (choice[0]>'0' && choice[0]<'5')){
         ch = choice[0];
     }
-    do{
+    else{
+        ch = '\0';
+    }
         switch(ch)
         {
         case '1' :
-            isvalid = 1;
+            return 1;
             break;
         case '2' :
-            isvalid = 2;
+            return 2;
             break;
         case '3' :
-            isvalid = 3;
+            return 3;
             break;
         case '4' :
-            isvalid = 4;
+            return 4;
             break;
         case '5' :
-            isvalid = 5;
+            return 5;
             break;
         case '6' :
-            exitpro();
+            return 6;
             break;
-        default :
-            repeat();
+        case '\0':
+            puts("\n~You used invalid characters to choose , Try again!");
+            return 0;
             break;
         }
-    }while(isvalid == 0);
-    return isvalid ;
 }
 //........................................................borrow new books
 void memNewBook()
@@ -889,8 +899,7 @@ int menu()
 {
     char choice[100];
     char ch;
-    int isvalid =0;
-    do{
+    while(1){
         puts("*******/Welcome to PeanutZee Library/*******");
         puts("~You are in : main menu\n____________________");
         puts("|1. Admin Login");
@@ -899,47 +908,43 @@ int menu()
         puts("|4. Exit\n");
         printf("Please enter your choice:");
         scanf(" %s" , &choice);
-        if( isdigit(choice[0]) && choice[1]=='\0'){
+        if( isdigit(choice[0]) && choice[1]=='\0' && (choice[0]>'0' && choice[0]<'5')){
             ch = choice[0];
-        }else{
+        }
+        else{
             ch = '\0' ;
         }
            switch (ch)
            {
            case '1' :
-                   isvalid = 1;
-                   break;
+                    return 1;
+                    break;
            case '2' :
-                   isvalid = 2;
-                   break;
+                    return 2;
+                    break;
            case '3' :
-                   isvalid = 3;
-                   break;
+                    return 3;
+                    break;
            case '4' :
-                   isvalid = 4;
-                   exitpro();
-                   break;
-           default :
-                   printf("\n~Your input is not valid!\n");
-                   repeat();
-                   system("cls");
-                   break;
+                    return 4;
+                    break;
+           case '\0' :
+                    puts("\n~You used invalid characters to choose , Try again!");
+                    return 0;
+                    break;
             }
-
-    }while( isvalid == 0);
-
-    return isvalid ;
+    }
 
 }
 //......................................................Repeat
 void repeat()
 {
-    printf("Enter any key to start again:");
+    printf("\nEnter any key:");
     getche();
     printf("\n");
 }
 //.....................................................exit
-void exitpro()
+int exitpro()
 {
     int x ;
     printf("~Are you sure you want to exit?   | 1.Yes  / 2.No | : ");
@@ -951,9 +956,10 @@ void exitpro()
         exit(1);
     }
     else if(x == 2){
-        printf("Returning to main menu....");
+        printf("Returning to recent menu....");
         Sleep(3000);
         system("cls");
+        return 1;
     }
 }
 //......................................................log in
@@ -1007,10 +1013,7 @@ int Login(int selection)//input for user selection
             return 0 ;
         }
     }
-        if(found == 0){
-            printf("Wrong username for admin!\n");
-            return 0 ;
-        }
+
     while(selection == 2){
         FILE *s , *m ;
         s = fopen(EMPFILE , "r");

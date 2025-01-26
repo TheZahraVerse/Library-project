@@ -27,6 +27,7 @@ int validname(char name[20]);
 int validID(char ID[10]);
 int validemail(char email[20]);
 int validdate(char date[20]);
+int isinfile(char input[100] , char file[100]);
 void repeat();//done
 int exitpro();//done
 //Admin Functions
@@ -98,10 +99,12 @@ void main()
 {
     int here ;
     int back ;
-    int who ;
+    int who =  0;
+    char dis ;
+    int adminselect , staffselect , memberselect;
     here = menu();
     while(1){
-          //choose between menus
+       //......................choose between menus
         switch(here)
         {
         case 0 :
@@ -109,13 +112,30 @@ void main()
             continue;//to repeat main menu
             break;
         case 1 :
-            who = Login(here);
+            if(who == 0){//log in again
+                who = Login(here);
+                break;
+            }
+            else
+                who = 1;//continue with this user
+            break;
         case 2 :
-            who = Login(here);
+            if(who ==0){
+                who = Login(here);
+                break;
+            }
+            else
+                who = 2;
             break;
         case 3 :
-            who = Login(here);
+            if(who == 0){
+                who = Login(here);
+                break;
+            }
+            else
+                who = 3;
             break;
+        //exiting the program
         case 4 :
            back = exitpro();
            if(back == 1){
@@ -125,27 +145,175 @@ void main()
            else
             break;
         }
+        //......................choose between characters
         switch(who)
         {
         case 0 ://back main menu
+            printf("\n~Returning to main menu...");
+            Sleep(3000);
+            system("cls");
             here = menu();
             continue;
             break;
+    //...........................choose in admin menu
         case 1 :
-            adminMenu();
+            switch(adminMenu())
+            {
+            case 0 :
+                puts("\n______________________");
+                printf("|1.Admin menu\n|2.Main menu\n\n~Select your choice:");
+                dis = getch();
+                printf("\n");
+                if(dis == '1'){
+                    here = 1;
+                    who = 1;
+                    printf("\n~Returning to admin menu...");
+                    Sleep(4000);
+                    system("cls");
+                    continue;
+                }
+                else{
+                    who = 0;
+                    printf("\n~Returning to main menu...");
+                    Sleep(3000);
+                    system("cls");
+                    here = menu();
+                    continue;
+                }
+                   break;
+            case 1 :
+                newEmp();
+                break;
+            case 2 :
+                staffList();
+                break;
+            case 3 :
+                rmEmp();
+                break;
+            case 4 :
+                report_ad();
+                break;
+            case 5 :
+                who = 0;
+                printf("\n~Returning to main menu...");
+                Sleep(3000);
+                system("cls");
+                here = menu();
+                continue;
+            }
             break;
+    //..............................choose in staff menu
         case 2 :
-            staffMenu();
+           switch(staffMenu())
+           {
+           case 0 :
+                puts("\n______________________");
+                printf("|1.Staff menu\n|2.Main menu\n\n~Select your choice:");
+                dis = getch();
+                printf("\n");
+                if(dis == '1'){
+                    here = 2;
+                    who = 2;
+                    printf("\n~Returning to staff menu...");
+                    Sleep(4000);
+                    system("cls");
+                    continue;
+                }
+                else{
+                    who = 0;
+                    printf("\n~Returning to main menu...");
+                    Sleep(3000);
+                    system("cls");
+                    here = menu();
+                    continue;
+                }
+                break;
+           case 1 :
+               newMem();
+               break;
+           case 2 :
+               revival();
+               break;
+           case 3 :
+               generalList();
+               break;
+           case 4 :
+               rmMem();
+               break;
+           case 5 :
+               bookRegister();
+               break;
+           case 6 :
+               report_emp();
+               break;
+           case 7 :
+               setting_emp();
+               break;
+           case 8 :
+                who = 0;
+                printf("\n~Returning to main menu...");
+                Sleep(3000);
+                system("cls");
+                here = menu();
+                continue;
+           }
             break;
+    //....................................choose in member menu
         case 3 :
-            memberMenu();
+            switch(memberMenu())
+            {
+            case 0 :
+                puts("\n______________________");
+                printf("|1.Member menu\n|2.Main menu\n\n~Select your choice:");
+                dis = getch();
+                printf("\n");
+                if(dis == '1'){
+                    here = 3;
+                    who = 3;
+                    printf("\n~Returning to member menu...");
+                    Sleep(4000);
+                    system("cls");
+                    continue;
+                }
+                else{
+                    who = 0;
+                    printf("\n~Returning to main menu...");
+                    Sleep(3000);
+                    system("cls");
+                    here = menu();
+                    continue;
+                }
+                break;
+            case 1 :
+                memNewBook();
+                break;
+            case 2 :
+                memReturn();
+                break;
+            case 3 :
+                memAllBooks();
+                break;
+            case 4 :
+                availBooks();
+                break;
+            case 5 :
+                setting_mem();
+                break;
+            case 6 :
+                who = 0;
+                printf("\n~Returning to main menu...");
+                Sleep(3000);
+                system("cls");
+                here = menu();
+                continue;
+            }
             break;
         case 4 ://repeat log in
+            who = 0;
             continue;
             break;
 
         }
-
 
     }
 }
@@ -165,7 +333,7 @@ int adminMenu()
     puts("|5. Logout and return to main menu\n");
     printf("Please enter your choice:");
     scanf(" %s" , choice);
-        if( isdigit(choice[0]) && choice[1]=='\0' && (choice[0]>'0' && choice[0]<'5')){
+        if( isdigit(choice[0]) && choice[1]=='\0' && (choice[0]>'0' && choice[0]<'6')){
             ch = choice[0];
         }
         else{
@@ -282,6 +450,10 @@ int addemp()
         while(1){
             printf("Username:");
             scanf(" %s" , temp);
+            if(isinfile(temp , EMPFILE)==1){
+                puts("\n~This username is already saved , Try again!");
+                continue;
+            }
             if(validusername(temp)){
                 strcpy(emp.username_emp , temp);
                 break;
@@ -295,7 +467,11 @@ int addemp()
             char pass1[20] , pass2[20];
             printf("Password(first time):");
             scanf(" %s" , pass1);
-            if(validpass(pass1)){
+            if(isinfile(pass1 , EMPFILE)==1){
+                puts("\n~This password is already saved , Try again!");
+                continue;
+            }
+           else if(validpass(pass1)){
                 printf("Password(second time):");
                 scanf(" %s" , pass2);
                 if(strcmp(pass1 , pass2) == 0){
@@ -323,9 +499,10 @@ int addemp()
 void newEmp()
 {
     int num , added;
-    puts("\n~How many staff you want to add? : ");
+    printf("\n~How many staff you want to add? : ");
     scanf(" %d" , &num);
     for(int i = 0 ; i < num ; i++){
+            printf("\n___________________________________");
         printf("\n~Add information(Employee %d of %d):\n" , i+1 , num);
         added = addemp();
         if(!added){
@@ -403,7 +580,6 @@ void report_ad()
 int staffMenu()
 {
     char choice[100] , ch ;
-
 
     puts("******/Welcome Employee/*******");
     puts("~You are in Staff menu\n_______________________________");
@@ -541,6 +717,10 @@ int addmem()
         while(1){
             printf("Username:");
             scanf(" %s" , temp);
+            if(isinfile(temp , MEMFILE)==1){
+                puts("\n~This username is already saved , Try again!");
+                continue;
+            }
             if(validusername(temp)){
                 strcpy(mem.username_mem , temp);
                 break;
@@ -554,7 +734,11 @@ int addmem()
             char pass1[20] , pass2[20];
             printf("Password(first time):");
             scanf(" %s" , pass1);
-            if(validpass(pass1)){
+            if(isinfile(pass1 , MEMFILE)==1){
+                puts("\n~This password is already saved , Try again!");
+                continue;
+            }
+           else if(validpass(pass1)){
                 printf("Password(second time):");
                 scanf(" %s" , pass2);
                 if(strcmp(pass1 , pass2) == 0){
@@ -585,10 +769,11 @@ void newMem()
     printf("\n~How many members you want to add? : ");
     scanf(" %d" , &num);
     for(int i = 0 ; i < num ; i++){
+        printf("\n___________________________________");
         printf("\n~Add information(Member %d of %d):\n" , i+1 , num);
         added = addmem();
         if(!added){
-            puts("\n~Failed to add employee!");
+            puts("\n~Failed to add member!");
             continue;
         }
     }
@@ -643,9 +828,9 @@ void generalList()
                 printf("No staff data found!");
         }
         fclose(f);
-        printf("Press any key to return to admin menu:");
+        printf("Press any key to return to staff menu:");
         getche();
-        printf("\n\nReturning to admin menu...");
+        printf("\n\nReturning to staff menu...");
         Sleep(3000);
         system("cls");
         adminMenu();//issue to choose again*/
@@ -658,80 +843,35 @@ void rmMem()
 
 }
 //......................................................books registering
-void bookRegister(struct book *x)
+int addBook()
 {
-    char temp[50] , user[10];
-    int num , id;
-    printf("~Enter your username :");//consider it valid
-    scanf(" %s" , user);
-    printf("\n~How many books you want to add ? :");
-    scanf(" %d" , &num);
-    FILE *f ;
+    char temp[50];
+    struct book b ;
+    FILE *f;
     f = fopen(GBOOKFILE , "a");
     if(f == NULL){
-        printf("\nCould not found the file of books!\n");
-        repeat();
-        return;
+        puts("\nError opening the file og general books");
+        return 0;
     }
     else{
-        for(int i = 0 ; i < num ; i++){
-            puts("\n_______________________________________");
-            printf("~Add information (book %d of %d):\n" , i+1 , num);
-            printf("Name of the book :");
-            //get input
-            scanf(" %s" , temp);//use '_' to separate words
-            //copy temp to save it to file later
-            strcpy(x->name , temp);
-
-            printf("The publication :");
-            scanf(" %s" , temp);
-            strcpy(x->publication , temp);
-
-            printf("Name of the writer :");
-            scanf(" %s" , temp);
-            strcpy(x->writer , temp);
-
-            printf("Year of publication :");
-            scanf(" %s" , temp);
-            strcpy(x->year , temp);
-
-            printf("Date of registration :");//automatic later
-            scanf(" %s" , temp);
-            strcpy(x->reg_date , temp);
-
-            //get a random number for id
-            id = rand();
-            //convert to string
-            itoa(id , temp , 10);
-            strcpy(x->id_book , temp);
-
-            //specify the register employee
-            strcpy(x->id_register , user);
-
-            //add information in file
-            fputs(x->name , f);
-            fputs("\n" , f);
-            fputs(x->writer , f);
-            fputs("\n" , f);
-            fputs(x->publication , f);
-            fputs("\n" , f);
-            fputs(x->id_book , f);
-            fputs("\n" , f);
-            fputs(x->year , f);
-            fputs("\n" , f);
-            fputs(x->reg_date , f);//same issue in file
-            fputs("\n" , f);
-            fputs(x->id_register , f);
-            fputs("\n" , f);
-
-            printf("\n~New book added successfully.\n");
-        }
-        fclose(f);
-        printf("\n~All books successfully saved by '%s'\n" , user);
-        printf("Press any key to return to staff menu:");//issue
-        getche();
+        printf("yes");
     }
-
+}
+void bookRegister()
+{
+    int num ;
+    int added ;
+    printf("\n~How many books you want to add ? :");
+    scanf(" %d" , &num);
+    for(int i = 0 ; i < num ; i++){
+        puts("\n_______________________________________");
+        printf("~Add information (book %d of %d):\n" , i+1 , num);
+        added = addBook();
+        if(!added){
+            puts("\n~Failed to add the book!");
+            continue;
+        }
+    }
 }
 //.......................................................report for employees
 void report_emp()
@@ -758,8 +898,8 @@ int memberMenu()
     puts("|5. Account setting");
     puts("|6. Logout and return to main menu");
     printf("\nPlease enter your choice:");
-    scanf(" %3s" , &choice);
-    if( isdigit(choice[0]) && choice[1]=='\0' && (choice[0]>'0' && choice[0]<'5')){
+    scanf(" %s" , &choice);
+    if( isdigit(choice[0]) && choice[1]=='\0' && (choice[0]>'0' && choice[0]<'7')){
         ch = choice[0];
     }
     else{
@@ -871,16 +1011,17 @@ void repeat()
 //.....................................................exit
 int exitpro()
 {
-    int x ;
+    char x ;
     printf("~Are you sure you want to exit?   | 1.Yes  / 2.No | : ");
-    scanf(" %d" , &x);
-    if( x == 1){
+    x = getche();
+    printf("\n");
+    if( x == '1'){
         printf("Exiting the program....");
         Sleep(3000);
         system("cls");
         exit(1);
     }
-    else if(x == 2){
+    else if(x == '2'){
         printf("Returning to recent menu....");
         Sleep(3000);
         system("cls");
@@ -890,10 +1031,12 @@ int exitpro()
 //......................................................log in
 int Login(int selection)//input for user selection
 {
+    puts("\n____________________");
     printf("Log in process... \n");
     char user_input[USERNAME];
     char pass_input[PASSWORD];
     char ch ;
+    char dis;
     int i , chance = 3;//the numbers to try your password chance
     int found ;//check for a founded user
     int usercheck;
@@ -934,14 +1077,14 @@ int Login(int selection)//input for user selection
                 }
             }
         }else{//if it was not admin
-            int dis ;
             puts("Wrong username for admin!");
             puts("\n______________________");
             printf("|1.Start Login again\n|2.Return to main menu\n\n~Select your choice:");
-            scanf(" %d" , &dis);
-            if(dis == 1)
+            dis = getche();
+            printf("\n");
+            if(dis == '1')
                 return 4 ;
-            if(dis == 2)
+           else
                 return 0 ;
         }
     }
@@ -994,7 +1137,13 @@ int Login(int selection)//input for user selection
             }
             if(found == 0){
                 printf("Employee not found!\n");
-                return 0 ;
+                puts("\n______________________");
+                printf("|1.Start Login again\n|2.Return to main menu\n\n~Select your choice:");
+                dis = getch();
+                if(dis == '1')
+                    return 4 ;
+                else
+                    return 0 ;
             }
         }
     }
@@ -1045,6 +1194,12 @@ int Login(int selection)//input for user selection
         }
         if(found == 0){
             printf("Member not found!\n");
+            puts("\n______________________");
+            printf("|1.Start Login again\n|2.Return to main menu\n\n~Select your choice:");
+            dis = getch();
+            if(dis == '1')
+                return 4 ;
+           else
                 return 0 ;
             }
         }
@@ -1181,3 +1336,27 @@ int validemail(char email[20])
     printf("email");
 }
 
+//.........................existing
+int isinfile(char input[100] , char file[100])
+{
+    char subject[100];
+    int found=0 ;
+    FILE *f;
+    f = fopen( file , "r");
+    if(f == NULL){
+        puts("\n~Could not found the file");
+        return 0;
+    }
+    else{
+        while(fgets(subject , sizeof(subject) , f)!= NULL){
+          if(strstr(subject , input) != NULL){
+            found = 1;
+            break;
+          }
+        }
+        if(found == 1)
+            return 1;
+        else
+            return 0;
+    }
+}

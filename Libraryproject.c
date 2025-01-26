@@ -375,6 +375,7 @@ int addemp()
         return 0 ;
     }
     else{
+        puts("\n<<<<<< Use dash (-) instead of space( ) >>>>>>\n");
         while(1){
             printf("First name:");
             scanf(" %s" , temp);
@@ -593,7 +594,7 @@ int staffMenu()
     puts("|8. Logout and return to main menu\n");
     printf("Please enter your choice:");
     scanf(" %s" , choice);
-    if( isdigit(choice[0]) && choice[1]=='\0' && (choice[0]>'0' && choice[0]<'5')){
+    if( isdigit(choice[0]) && choice[1]=='\0' && (choice[0]>'0' && choice[0]<'9')){
         ch = choice[0];
     }
     else{
@@ -642,6 +643,7 @@ int addmem()
         return 0 ;
     }
     else{
+        puts("\n<<<<<< Use dash (-) instead of space( ) >>>>>>\n");
         while(1){
             printf("First name:");
             scanf(" %s" , temp);
@@ -854,7 +856,111 @@ int addBook()
         return 0;
     }
     else{
-        printf("yes");
+        puts("\n<<<<<< Use dash (-) instead of space( ) >>>>>>\n");
+        puts("(if there is any number in names , use it alphabetical like 'one')\n");
+        //name of the book
+        while(1){
+            printf("Name of the book :");
+            scanf(" %s" , temp);
+            if(validname(temp)==1){
+                strcpy( b.name , temp);
+                break;
+            }
+            else{
+                puts("\n~Invalid name for the book , Try again!");
+            }
+        }
+        //writer
+        while(1){
+            printf("Name of the author :");
+            scanf(" %s" , temp);
+            if(validname(temp)==1){
+                strcpy( b.writer , temp);
+                break;
+            }
+            else{
+                puts("\n~Invalid name for the author , Try again!");
+            }
+        }
+        //publication
+        while(1){
+            printf("The publication :");
+            scanf(" %s" , temp);
+            if(validname(temp)==1){
+                strcpy( b.publication , temp);
+                break;
+            }
+            else{
+                puts("\n~Invalid name for the publication , Try again!");
+            }
+        }
+        //year of publication
+        while(1){
+            int alldigit = 1 ;
+            printf("Year of publication (yyyy):");
+            scanf(" %s" , temp);
+            if(strlen(temp) != 4){
+                puts("\n~It must be only 4 digits for the year!");
+                continue;
+            }
+
+            for(int i = 0 ; i < 4 ; i++){
+                if(!isdigit(temp[i])){
+                    alldigit = 0;
+                    break;
+                }
+            }
+            if(!alldigit){
+                puts("\n~Use only digits , Try again!");
+                continue;
+            }
+            else if(strlen(temp)==4 && alldigit==1){
+                strcpy( b.year , temp);
+                break;
+            }
+        }
+        //date of registeration ...........automatic later
+        while(1){
+            printf("Date of registration(dd/mm/yyyy):");
+            scanf(" %s" , temp);
+            if(validdate(temp)==1){
+                strcpy( b.reg_date , temp);
+                break;
+            }
+            else{
+                puts("\n~Invalid date form , Try again!");
+            }
+
+        }
+        //staff username
+        while(1){
+            printf("Enter your username>>This information will be saved by :");
+            scanf(" %s" , temp);
+            if(validusername(temp)==1){
+                strcpy(b.id_register , temp);
+                break;
+            }
+            else{
+                puts("\n~Invalid username , Try again!");
+            }
+        }
+
+        //random id number for book
+        srand(time(NULL));
+        int id = rand();
+        sprintf(b.id_book , "%d" , id);
+
+        //to save info in file
+        fprintf(f, "|%s|%s|%s|%s|%s|%s|%s|\n", b.id_book, b.name, b.writer,
+                  b.publication, b.year, b.reg_date, b.id_register);
+                  //...........................have issues in saving correctly
+        fclose(f);
+        puts("\n~All books added successfully!\n");
+        printf("~Returning to staff menu...");
+        Sleep(4000);
+        system("cls");
+        return 1 ;
+
     }
 }
 void bookRegister()
@@ -1287,13 +1393,13 @@ int validname(char name[20])
     int len = strlen(name);
     int count = 0 ;
     if(len < 4 || len > 20 ){
-        printf("\n~Name must be between 4 and 20 characters!\n");
+        printf("\n~Your input must be between 4 and 20 characters!\n");
         return 0 ;
     }
     else{
         for(int i = 0 ; i < len ; i++){
-            if( !isalpha(name[i]) ){
-                printf("\n~Invalid name , Use only alphabetical characters!\n");
+            if( !(isalpha(name[i]) || name[i]=='-')){
+                printf("\n~Invalid input , Use only alphabetical characters!\n");
                 return 0 ;
             }
             else
@@ -1329,7 +1435,22 @@ int validID(char ID[10])
 }
 int validdate(char date[20])
 {
-    printf("date");
+    if(strlen(date) != 10 || date[2] != '/' || date[5] != '/'){
+        puts("\n~Use the suggested form of date");
+        return 0;
+    }
+    else{
+        for(int i = 0 ; i < 10 ; i++){
+            if(i==2 || i==5)
+                continue;
+            if( !isdigit(date[i]) ){
+                puts("\n~Use digits and '/' only");
+                return 0;
+            }
+        }
+    }
+    //valid
+    return 1;
 }
 int validemail(char email[20])
 {

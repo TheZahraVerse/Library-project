@@ -411,7 +411,7 @@ int addemp()
                 puts("\n~Invalid ID  number , Try again");
             }
         }
-        //join date
+        //join date................automatic
         while(1){
             printf("Join date(dd/mm/yyyy):");
             scanf(" %s" , temp);
@@ -489,7 +489,7 @@ int addemp()
             }
         }
         //write them on file
-        fprintf(e  , "%s\n%s\n%s\n%s\n%s\n%s\n09%s\n%s\n" ,emp.username_emp
+        fprintf(e  , "%s\n%s\n%s\n%10s\n%s\n%s\n09%s\n%s\n" ,emp.username_emp
                  , emp.pass_emp , emp.id_emp , emp.join_date_e , emp.name , emp.family , emp.phone, emp.email );
         fclose(e);
         puts("\n~Employee added successfully!");
@@ -511,6 +511,9 @@ void newEmp()
             continue;
         }
     }
+    printf("\n~Returning to admin menu...");
+    Sleep(4000);
+    system("cls");
 }
 
 //...................................................view staff list
@@ -951,7 +954,7 @@ int addBook()
         sprintf(b.id_book , "%d" , id);
 
         //to save info in file
-        fprintf(f, "|%s|%s|%s|%s|%s|%s|%s|\n", b.id_book, b.name, b.writer,
+        fprintf(f, "%s\n%s\n%s\n%s\n%s\n%s\n%s\n", b.id_book, b.name, b.writer,
                   b.publication, b.year, b.reg_date, b.id_register);
                   //...........................have issues in saving correctly
         fclose(f);
@@ -1433,7 +1436,7 @@ int validID(char ID[10])
         }
     }
 }
-int validdate(char date[20])
+int validdate(char date[10])
 {
     if(strlen(date) != 10 || date[2] != '/' || date[5] != '/'){
         puts("\n~Use the suggested form of date");
@@ -1480,4 +1483,9 @@ int isinfile(char input[100] , char file[100])
         else
             return 0;
     }
+}
+void todaydate()
+{
+    struct tm
+    localtime
 }

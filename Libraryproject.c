@@ -61,9 +61,10 @@ struct employee
     char name[20];
     char family[20];
     char join_date_e[10];
-    char phone[11];
+    char phone[20];
     char id_emp[20];
     char email[40];
+    char status[2]; // to know what her position is
     struct employee *link ;
 };
 struct employee *start_e , *e;
@@ -78,9 +79,10 @@ struct member
     char family[20];
     char join_date_m[10];
     char validate[10];
-    char phone[11];
+    char phone[20];
     char id_mem[20];
     char email[40];
+    char status[3]; //condition for each member to know the position
     struct member *link ;
 };
 struct member *start_m  , *m;
@@ -95,6 +97,7 @@ struct book
     char reg_date[11];//automatic
     char id_book[10];
     char reg_user[10];
+    struct book *link ;
 };
 struct book *start_b , *b ;
 struct book B ;
@@ -427,17 +430,13 @@ int addemp()
         }
         //phone
         while(1){
-            printf("Phone number:09");
+            printf("Phone number:");
             scanf(" %s" , temp);
             if(strcmp(temp , ":)")==0)
                 return 0;
-            if(validphone(temp)){
-                strcpy(emp.phone, temp);
+//.......................................................................BUG saving phone number
+                strncpy(emp.phone , temp , sizeof(emp.phone)-1 );
                 break;
-            }
-            else{
-                puts("\n~Invalid Phone number , Try again");
-            }
         }
         //Email
         while(1){
@@ -503,10 +502,10 @@ int addemp()
         //join date
         todaydate(emp.join_date_e);
         //write them on file
-        fprintf(e  , "%s\n%s\n%s\n%s\n%s\n%s\n09%s\n%s\n" ,emp.username_emp
-                 , emp.pass_emp , emp.id_emp , emp.join_date_e , emp.name , emp.family , emp.phone, emp.email );
-        fclose(e);
+        fprintf(e  , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" ,emp.username_emp
+                 , emp.pass_emp , emp.id_emp , emp.join_date_e , emp.name , emp.family , emp.phone , emp.email );
         puts("\n~Employee added successfully!");
+        fclose(e);
         return 1 ;
     }
 }
@@ -530,8 +529,10 @@ void newEmp()
     if(done==1){
         puts("\n~All staff added successfully and the join date is today.");
     }
-    printf("\n~Returning to admin menu...");
-    Sleep(4000);
+    printf("\n~Press any key to return to admin menu:");
+    getche();
+    printf("\n\n~Returning to admin menu...");
+    Sleep(3000);
     system("cls");
 }
 
@@ -539,8 +540,9 @@ void newEmp()
 void staffList()
 {
     struct employee emp;
+    int empcount = 1 ;
     //system cls
-    puts("\n~You are watching the list of staff~");
+    puts("\n****_________  List of staff  __________****");
     puts("______________________________________");
     FILE *f ;
     f = fopen(EMPFILE , "r");
@@ -551,20 +553,10 @@ void staffList()
         adminMenu();
     }
     else{
-       int empcount = 1 ;
-       while(feof(f)== 0){
-        fscanf(f , "%s\n" , emp.username_emp);
-        fscanf(f , "%s\n" , emp.pass_emp);
-        fscanf(f , "%s\n" , emp.id_emp);
-        fscanf(f , "%s\n" , emp.join_date_e);
-        fscanf(f , "%s\n" , emp.name);
-        fscanf(f , "%s\n" , emp.family);
-        fscanf(f , "%s\n" , emp.phone);
-        fscanf(f , "%s\n" , emp.email);
-        if(emp.username_emp == EOF)
-            break;
+        while(fscanf( f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" , emp.username_emp , emp.pass_emp ,
+                emp.id_emp , emp.join_date_e , emp.name , emp.family , emp.phone , emp.email)!= EOF){
         //show the list
-        printf("|~~Employee No.%d~~\n" , empcount++);
+        printf("|~~Employee No.%d~~\n" , empcount);
         printf("|First name   :  %s\n" , emp.name);
         printf("|Last name    :  %s\n" , emp.family);
         printf("|ID number    :  %s\n" , emp.id_emp);
@@ -574,11 +566,12 @@ void staffList()
         printf("|Username     :  %s\n" , emp.username_emp);
         printf("|Password     :  %s\n" , emp.pass_emp);
         puts("______________________________________");
+        empcount++ ;
         }
         if(empcount == 1)
             printf("No staff data found!");
     }
-    fclose(f);
+
     printf("Press any key to return to admin menu:");
     getche();
     printf("\n\nReturning to admin menu...");
@@ -822,12 +815,14 @@ void newMem()
 void revival()
 {
 
+
 }
 //......................................................general list of every member
 void generalList()
 {
     struct member mem ;
-    printf("\n~You are watching the list of Members~\n");
+    int memcount = 1 ;
+    printf("\n****___________  List of Members  _________****\n");
     puts("______________________________________");
     FILE *f ;
     f = fopen(MEMFILE , "r");
@@ -838,33 +833,22 @@ void generalList()
         staffMenu();
     }
     else{
-        int empcount = 1 ;
-        while(feof(f)== 0){
-            fscanf(f , "%s\n" , mem.username_mem);//issue in showing the username and pass
-            fscanf(f , "%s\n" , mem.pass_mem);
-            fscanf(f , "%s\n" , mem.validate);
-            fscanf(f , "%s\n" , mem.id_mem);
-            fscanf(f , "%s\n" , mem.join_date_m);
-            fscanf(f , "%s\n" , mem.name);
-            fscanf(f , "%s\n" , mem.family);
-            fscanf(f , "%s\n" , mem.phone);
-            fscanf(f , "%s\n" , mem.email);
-            if(mem.username_mem == EOF)
-                break;
+        while(fscanf( f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" , mem.username_mem , mem.pass_mem
+                     , mem.id_mem , mem.join_date_m , mem.name , mem.family , mem.phone , mem.email) != EOF){
             //show the list
-            printf("|~~Member No.%d~~\n" , empcount++);
+            printf("|~~Member No.%d~~\n" , memcount++);
             printf("|First name   :  %s\n" , mem.name);
             printf("|Last name    :  %s\n" , mem.family);
             printf("|ID number    :  %s\n" , mem.id_mem);
             printf("|Phone number :  %s\n" , mem.phone);
             printf("|E-mail       :  %s\n" , mem.email);
             printf("|Join date    :  %s\n" , mem.join_date_m);
-            printf("|Validate     :  %s\n" , mem.validate);
             printf("|Username     :  %s\n" , mem.username_mem);
             printf("|Password     :  %s\n" , mem.pass_mem);
-            puts("______________________________________");
-            }
-            if(empcount == 1)
+            puts("______________________________________");\
+            memcount++ ;
+        }
+        if(memcount == 1)
                 printf("No staff data found!");
         }
         fclose(f);
@@ -976,7 +960,6 @@ int addBook()
         //to save info in file
         fprintf(f, "%s\n%s\n%s\n%s\n%s\n%s\n%s\n", b.id_book, b.name, b.writer,
                   b.publication, b.year, b.reg_date, E.username_emp);
-                  //...........................have issues in saving correctly
         fclose(f);
         puts("\n~All books added successfully!\n");
         printf("~Returning to staff menu...");
@@ -1065,6 +1048,7 @@ int memberMenu()
 void memNewBook()
 {
 
+
 }
 //........................................................return books
 void memReturn()
@@ -1079,27 +1063,38 @@ void memAllBooks()
 //..........................................................available books to borrow
 void availBooks()
 {
-    struct book b;
+    struct book b ;
+    int bookcount = 1 ;
+    int line = 0 ;//how many books you have
     FILE *f ;
     f = fopen(GBOOKFILE , "r");
     if(f == NULL){
-        puts("\n~Could not read the file of general books! , try again!");
+        printf("Could not read the file");
     }
     else{
-        while(feof(f) == 0){
-            fgets(b.id_book , sizeof(b.id_book) , f);
-            fgets(b.name , sizeof(b.name) , f);
-            fgets(b.writer , sizeof(b.writer) , f);
-            fgets(b.publication , sizeof(b.publication) , f);
-            fgets(b.year, 5 , f);
-            fgets(b.reg_date , 11, f);
-            fgets(b.reg_user , sizeof(b.reg_user) , f);
+        puts("\n****____________List of available books___________****");
+        while(fscanf(f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n" ,b.id_book , b.name , b.writer ,
+                    b.publication , b.year , b.reg_date , b.reg_user ) != EOF){
+            printf("\n____________________________________");
+            printf("\n|Book ID              : %s" , b.id_book);
+            printf("\n|Book name            : %s" , b.name);
+            printf("\n|The author           : %s" , b.writer);
+            printf("\n|The publication      : %s" , b.publication);
+            printf("\n|Year of publication  : %s" , b.year);
+            printf("\n|Date of registration : %s" , b.reg_date);
+            printf("\n|Saved by (Username)  : %s" , b.reg_user);
+            bookcount++ ;
         }
-        printf("%s%s%s%s\n%s%s" , b.name , b.writer , b.publication , b.year , b.id_book , b.reg_date);
-        puts("\n~Press any key to return to Member menu :");
+        if(bookcount==1){
+            puts("\n~Could not found any books!");
+        }
+        printf("\n____________________________________");
+        fclose(f);
+        printf("\n\n~Press any key to return to Member menu:");
         getche();
+        printf("\n\n~Returning to Member menu...");
+        Sleep(4000);
     }
-
 }
 //...........................................................setting for member's account
 void setting_mem()
@@ -1200,8 +1195,17 @@ int Login(int selection)//input for user selection
     if(strcmp(user_input , ":)")==0)
         return 0;
     usercheck = validusername(user_input);
-    if(usercheck == 0)
-        return 0 ;
+    if(usercheck == 0){
+        puts("\n______________________");
+        printf("|1.Start Login again\n|2.Return to main menu\n\n~Select your choice:");
+        dis = getche();
+        printf("\n");
+        if(dis == '1')
+            return 4 ;
+        else
+            return 0 ;
+    }
+
     else{
     //check the input username character
     while(selection == 1){
@@ -1420,11 +1424,11 @@ int validpass(char pass[20])
 {
     printf("pass");
 }
-int validphone(char phone[10])
+int validphone(char phone[11])
 {
     int len = strlen(phone);//size of phone number without 09
     int count = 0 ;
-    if( len != 9 ){
+    if( len != 11 ){
         printf("\n~Phone number must have exactly 11 digits!\n");
         return 0 ;//not valid
     }
@@ -1439,7 +1443,7 @@ int validphone(char phone[10])
                 count++ ;
             }
         }
-        if(count == 10)//all of the characters are valid
+        if(count == 11)//all of the characters are valid
             return 1 ;
     }
 
@@ -1544,3 +1548,4 @@ void todaydate(char *current)
     //add 1900 to get real number of year
     sprintf(current , "%02d/%02d/%d" , local->tm_mday , local->tm_mon + 1 , local->tm_year+1900);//(dd/mm/yyyy)
 }
+//......................................................Functions to use linked list

@@ -1,6 +1,7 @@
 //Library management project---> *PEANUTZEE LIBRARY*
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <windows.h>
 #include <conio.h>
@@ -16,6 +17,9 @@
 #define ARCSTAFF "Staffarchive.txt"
 #define ARCMEMBER "Membersarchive.txt"
 //..........................................Functions
+//Linked list functions
+struct employee* CallFileLinkEmp();
+struct member* CallFileLinkMem();
 //General Functions
 void manage(int here);
 int menu();//done
@@ -33,26 +37,28 @@ void repeat();//done
 int exitpro();//done
 //Admin Functions
 int adminMenu();//done
-void newEmp();//done
-void staffList();//done
-void rmEmp();
-void report_ad();
+void newEmp();//..............................................
+void staffList();//.............................................
+void rmEmp();//..................................................
+void report_ad();//.............................................
 //staff Functions
 int staffMenu();//done
 void newMem();//done
-void revival();
-void generalList();
-void rmMem();
-void bookRegister();
-void report_emp();
-void setting_emp();
+void revival();//.............................................
+void generalList();//done
+void rmMem();//....................................................
+void bookRegister();//done
+void report_emp();//............................................
+int setting_emp(struct employee *head);//.........................................
+void savechanges_emp(struct employee *head);
 //Member Functions
 int memberMenu();//done
-void memNewBook();
-void memReturn();
-void memAllBooks();
-void availBooks();
-void setting_mem();
+void memNewBook();//...........................................
+void memReturn();//.............................................
+void memAllBooks();//............................................
+void availBooks();//done
+int memberSetting(struct member *head);
+void memberSavechanges(struct member *head);
 //Staff structure
 struct employee
 {
@@ -60,14 +66,13 @@ struct employee
     char pass_emp[16];
     char name[20];
     char family[20];
-    char join_date_e[10];
+    char join_date_e[15];
     char phone[20];
     char id_emp[20];
     char email[40];
     char status[2]; // to know what her position is
     struct employee *link ;
 };
-struct employee *start_e , *e;
 struct employee E ;
 
 //Members structure
@@ -77,7 +82,7 @@ struct member
     char pass_mem[16];
     char name[20];
     char family[20];
-    char join_date_m[10];
+    char join_date_m[15];
     char validate[10];
     char phone[20];
     char id_mem[20];
@@ -85,7 +90,6 @@ struct member
     char status[3]; //condition for each member to know the position
     struct member *link ;
 };
-struct member *start_m  , *m;
 struct member M ;
 //Books structure
 struct book
@@ -99,7 +103,6 @@ struct book
     char reg_user[10];
     struct book *link ;
 };
-struct book *start_b , *b ;
 struct book B ;
 
 
@@ -109,10 +112,14 @@ void main()
     int here ;
     int back ;
     int who =  0;
+    int result ;
     char dis ;
     int adminselect , staffselect , memberselect;
     here = menu();
     while(1){
+        //call the head of files linked list
+        struct employee *head_emp = CallFileLinkEmp();
+        struct member *head_mem = CallFileLinkMem();
        //......................choose between menus
         switch(here)
         {
@@ -256,8 +263,54 @@ void main()
                report_emp();
                break;
            case 7 :
-               setting_emp();
-               break;
+                result = setting_emp(head_emp);
+                if(result == 0){//unsuccessful in changing info
+                    free(head_emp);
+                    puts("\n______________________");
+                    printf("|1.Staff menu\n|2.Account setting\n\n~Select your choice:");
+                    dis = getch();
+                    printf("\n");
+                    if(dis == '1'){
+                        here = 2;
+                        who = 2;
+                        printf("\n~Returning to staff menu...");
+                        Sleep(4000);
+                        system("cls");
+                        continue;
+                    }
+                    else{
+                        who = 2;
+                        printf("\n~Returning to setting...");
+                        Sleep(3000);
+                        system("cls");
+                        here = 2;
+                        who = 2 ;
+                        continue;
+                    }
+                }
+                else if(result == 1){//successful in changing info
+                    puts("\n______________________");
+                    printf("|1.Staff menu\n|2.Main menu\n\n~Select your choice:");
+                    dis = getch();
+                    printf("\n");
+                    if(dis == '1'){
+                        here = 2;
+                        who = 2;
+                        printf("\n~Returning to staff menu...");
+                        Sleep(4000);
+                        system("cls");
+                        continue;
+                    }
+                    else{
+                        who = 0;
+                        printf("\n~Returning to main menu...");
+                        Sleep(3000);
+                        system("cls");
+                        here = menu();
+                        continue;
+                    }
+                }
+                break;
            case 8 :
                 who = 0;
                 printf("\n~Returning to main menu...");
@@ -306,7 +359,54 @@ void main()
                 availBooks();
                 break;
             case 5 :
-                setting_mem();
+               result = memberSetting(head_mem);
+               if(result == 0){//was not successful
+                    free(head_mem);
+                    puts("\n______________________");
+                    printf("|1.Member menu\n|2.Main menu\n\n~Select your choice:");
+                    dis = getch();
+                    printf("\n");
+                    if(dis == '1'){
+                        here = 3;
+                        who = 3;
+                        printf("\n~Returning to Member menu...");
+                        Sleep(4000);
+                        system("cls");
+                        continue;
+                    }
+                    else{
+                        who = 0;
+                        printf("\n~Returning to Main menu...");
+                        Sleep(3000);
+                        system("cls");
+                        here = menu();
+                        continue;
+                    }
+               }
+               else if(result == 1){//changing successful
+                    free(head_emp);
+                    puts("\n______________________");
+                    printf("|1.Member menu\n|2.Account setting\n\n~Select your choice:");
+                    dis = getch();
+                    printf("\n");
+                    if(dis == '1'){
+                        here = 3;
+                        who = 3;
+                        printf("\n~Returning to Member menu...");
+                        Sleep(4000);
+                        system("cls");
+                        continue;
+                    }
+                    else{
+                        who = 3;
+                        printf("\n~Returning to setting...");
+                        Sleep(3000);
+                        system("cls");
+                        here = 3;
+                        who = 3;
+                        continue;
+                    }
+               }
                 break;
             case 6 :
                 who = 0;
@@ -332,7 +432,7 @@ void main()
 int adminMenu()
 {
     char choice[100] , ch ;
-    char current[11];
+    char current[10];
     todaydate(current);
     puts("******/     Welcome Admin    /*******\n");
     printf("~You are in Admin menu             Date: %s\n______________________________________\n" , current);
@@ -434,7 +534,7 @@ int addemp()
             scanf(" %s" , temp);
             if(strcmp(temp , ":)")==0)
                 return 0;
-//.......................................................................BUG saving phone number
+                //add valid phone
                 strncpy(emp.phone , temp , sizeof(emp.phone)-1 );
                 break;
         }
@@ -550,35 +650,37 @@ void staffList()
         printf("The staff file has not found !\nYou will return to admin menu...");
         Sleep(5000);
         system("cls");
-        adminMenu();
+        return;
     }
     else{
-        while(fscanf( f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" , emp.username_emp , emp.pass_emp ,
-                emp.id_emp , emp.join_date_e , emp.name , emp.family , emp.phone , emp.email)!= EOF){
-        //show the list
-        printf("|~~Employee No.%d~~\n" , empcount);
-        printf("|First name   :  %s\n" , emp.name);
-        printf("|Last name    :  %s\n" , emp.family);
-        printf("|ID number    :  %s\n" , emp.id_emp);
-        printf("|Phone number :  %s\n" , emp.phone);
-        printf("|E-mail       :  %s\n" , emp.email);
-        printf("|Join date    :  %s\n" , emp.join_date_e);
-        printf("|Username     :  %s\n" , emp.username_emp);
-        printf("|Password     :  %s\n" , emp.pass_emp);
-        puts("______________________________________");
-        empcount++ ;
+        while( fscanf(f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" , emp.username_emp , emp.pass_emp
+                    ,emp.id_emp , emp.join_date_e , emp.name , emp.family , emp.phone , emp.email)!=EOF ){
+            if(validusername(emp.username_emp)){
+                //show the list
+                printf("|~~Employee No.%d~~\n" , empcount);
+                printf("|First name   :  %s\n" , emp.name);
+                printf("|Last name    :  %s\n" , emp.family);
+                printf("|ID number    :  %s\n" , emp.id_emp);
+                printf("|Phone number :  %s\n" , emp.phone);
+                printf("|E-mail       :  %s\n" , emp.email);
+                printf("|Join date    :  %s\n" , emp.join_date_e);
+                printf("|Username     :  %s\n" , emp.username_emp);
+                printf("|Password     :  %s\n" , emp.pass_emp);
+                puts("______________________________________");
+                empcount++ ;
+            }
         }
+        fclose(f);
         if(empcount == 1)
             printf("No staff data found!");
-    }
 
+    }
     printf("Press any key to return to admin menu:");
     getche();
     printf("\n\nReturning to admin menu...");
     Sleep(3000);
     system("cls");
 }
-
 
 //...................................................remove employee
 void rmEmp()
@@ -595,7 +697,7 @@ void report_ad()
 int staffMenu()
 {
     char choice[100] , ch ;
-    char current[11];
+    char current[10];
     todaydate(current);
     printf("******/  Welcome  %s  /*******\n\n" , E.username_emp);
     printf("~You are in Staff menu              Date: %s\n_______________________________\n" , current);
@@ -780,7 +882,7 @@ int addmem()
         //join date
         todaydate(mem.join_date_m);
         //write them on file
-        fprintf(e  , "%s\n%s\n%s\n%s\n%s\n%s\n09%s\n%s\n" ,mem.username_mem
+        fprintf(e  , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" ,mem.username_mem
                  , mem.pass_mem , mem.id_mem, mem.join_date_m , mem.name , mem.family , mem.phone, mem.email );
         fclose(e);
         puts("\n~Member added successfully!");
@@ -835,18 +937,20 @@ void generalList()
     else{
         while(fscanf( f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" , mem.username_mem , mem.pass_mem
                      , mem.id_mem , mem.join_date_m , mem.name , mem.family , mem.phone , mem.email) != EOF){
+            if(validusername(mem.username_mem)){
             //show the list
-            printf("|~~Member No.%d~~\n" , memcount++);
-            printf("|First name   :  %s\n" , mem.name);
-            printf("|Last name    :  %s\n" , mem.family);
-            printf("|ID number    :  %s\n" , mem.id_mem);
-            printf("|Phone number :  %s\n" , mem.phone);
-            printf("|E-mail       :  %s\n" , mem.email);
-            printf("|Join date    :  %s\n" , mem.join_date_m);
-            printf("|Username     :  %s\n" , mem.username_mem);
-            printf("|Password     :  %s\n" , mem.pass_mem);
-            puts("______________________________________");\
-            memcount++ ;
+                printf("|~~Member No.%d~~\n" , memcount);
+                printf("|First name   :  %s\n" , mem.name);
+                printf("|Last name    :  %s\n" , mem.family);
+                printf("|ID number    :  %s\n" , mem.id_mem);
+                printf("|Phone number :  %s\n" , mem.phone);
+                printf("|E-mail       :  %s\n" , mem.email);
+                printf("|Join date    :  %s\n" , mem.join_date_m);
+                printf("|Username     :  %s\n" , mem.username_mem);
+                printf("|Password     :  %s\n" , mem.pass_mem);
+                puts("______________________________________");\
+                memcount++ ;
+            }
         }
         if(memcount == 1)
                 printf("No staff data found!");
@@ -991,8 +1095,127 @@ void report_emp()
 
 }
 //.........................................................staff account settings
-void setting_emp()
+int setting_emp(struct employee *head)
 {
+    struct employee *temp;
+    temp = head ;
+    char ch ;
+    char input[50] , pass1[50] , pass2[50];
+    puts("\n*****__________  Account setting  _________*****");
+    puts("_______________________________");
+    printf("|1. Password\n");
+    printf("|2. Phone number\n");
+    printf("|3. Email\n");
+    printf("|4. Exit");
+    printf("\n\n~Please enter your choice :");
+    ch = getche();
+    switch(ch)
+    {
+    case '1':
+        printf("\n\n~Changing password...");
+        Sleep(2000);
+        puts("\n_____________________________________");
+        while(1){
+            //password checks and a way to exit
+            printf("Enter your new password(first time) : ");
+            scanf(" %s" , pass1);
+            if(strcmp(pass1 , ":)")==0)
+                return 0;
+
+            if(validpass(pass1)){
+                printf("\nEnter your new password again(second time) : ");
+                scanf(" %s" , pass2);
+                if(strcmp(pass2 , ":)")==0)
+                    return 0;
+
+                if(validpass(pass2)){
+                    if(strcmp(pass1 , pass2 )==0){
+                        //looking for username to change the pass word
+                        temp = head ;
+                        while(temp != NULL){
+                            if(strcmp(temp->username_emp , E.username_emp)==0){
+                                strcpy(temp->pass_emp , pass1);
+                                //save the changes and write it in a new file
+                                savechanges_emp(head);
+                                puts("\n~Your password has been changed successfully.");
+                                Sleep(2000);
+                                return 1;
+                            }
+                            temp = temp->link ;
+                        }
+                    }
+                    else{
+                        puts("\n~Passwords do not match , try again!");
+                        continue;
+                    }
+                }
+                else
+                    puts("\n~Invalid password!");
+            }
+            else
+                puts("\n~Invalid password!");
+        }
+        break;
+    case '2':
+        printf("\n\n~Changing phone number...");
+        Sleep(2000);
+        puts("_______________________________________");
+        while(1){
+            printf("\nEnter your new phone number : ");
+            scanf(" %s" , input);
+            if(strcmp(input , ":)")==0)
+                return 0;
+
+            if(validphone(input)){
+                temp = head ;//for repeating the cycle
+                while(temp != NULL){
+                    if(strcmp(temp->username_emp , E.username_emp)==0){
+                        strcpy(temp->phone , input);
+                        //save the changes and write it in a new file
+                        savechanges_emp(head);
+                        puts("\n~Your phone number has been changed successfully.");
+                        Sleep(2000);
+                        return 1;
+                    }
+                    temp = temp->link ;
+                }
+            }
+            else
+                puts("\n~Invalid phone number!");
+        }
+        break;
+    case '3':
+        printf("\n\nChanging Email address...");
+        Sleep(2000);
+        puts("____________________________________");
+        while(1){
+            printf("\nEnter your new E-mail address : ");
+            scanf(" %s" , input);
+            if(strcmp(input , ":)")==0)
+                return 0;
+
+            if(validemail(input)){
+                temp = head ;//for repeating the cycle
+                while(temp != NULL){
+                    if(strcmp(temp->username_emp , E.username_emp)==0){
+                        strcpy(temp->email , input);
+                        //save the changes and write it in a new file
+                        savechanges_emp(head);
+                        puts("\n~Your Email address has been successfully changed!");
+                        Sleep(2000);
+                        return 1;
+                    }
+                    temp = temp->link ;
+                }
+            }
+            else
+                puts("\n~Invalid email!");
+        }
+        break;
+    case '4':
+        return 0;
+    }
+    return 0;
 
 }
 //                              *MEMBER SECTION*
@@ -1000,7 +1223,7 @@ void setting_emp()
 int memberMenu()
 {
     char choice[100] , ch ;
-    char current[11];
+    char current[10];
     todaydate(current);
     printf("\n*******/   Welcome    %s   /*******\n\n" , M.username_mem);
     printf("~You are in Member menu             Date: %s\n_____________________________\n" , current);
@@ -1075,15 +1298,19 @@ void availBooks()
         puts("\n****____________List of available books___________****");
         while(fscanf(f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n" ,b.id_book , b.name , b.writer ,
                     b.publication , b.year , b.reg_date , b.reg_user ) != EOF){
-            printf("\n____________________________________");
-            printf("\n|Book ID              : %s" , b.id_book);
-            printf("\n|Book name            : %s" , b.name);
-            printf("\n|The author           : %s" , b.writer);
-            printf("\n|The publication      : %s" , b.publication);
-            printf("\n|Year of publication  : %s" , b.year);
-            printf("\n|Date of registration : %s" , b.reg_date);
-            printf("\n|Saved by (Username)  : %s" , b.reg_user);
-            bookcount++ ;
+            if(validname(b.name)){
+                printf("\n____________________________________");
+                printf("\n\n~Book number %d ~" , bookcount);
+                printf("____________________");
+                printf("\n|Book ID              : %s" , b.id_book);
+                printf("\n|Book name            : %s" , b.name);
+                printf("\n|The author           : %s" , b.writer);
+                printf("\n|The publication      : %s" , b.publication);
+                printf("\n|Year of publication  : %s" , b.year);
+                printf("\n|Date of registration : %s" , b.reg_date);
+                printf("\n|Saved by (Username)  : %s" , b.reg_user);
+                bookcount++ ;
+            }
         }
         if(bookcount==1){
             puts("\n~Could not found any books!");
@@ -1097,8 +1324,127 @@ void availBooks()
     }
 }
 //...........................................................setting for member's account
-void setting_mem()
+int memberSetting(struct member *head)
 {
+    struct member *temp;
+    temp = head ;
+    char ch ;
+    char input[50] , pass1[50] , pass2[50];
+    puts("\n*****__________  Account setting  _________*****");
+    puts("_______________________________");
+    printf("|1. Password\n");
+    printf("|2. Phone number\n");
+    printf("|3. Email\n");
+    printf("|4. Exit");
+    printf("\n\n~Please enter your choice :");
+    ch = getche();
+    switch(ch)
+    {
+    case '1':
+        printf("\n\n~Changing password...");
+        Sleep(2000);
+        puts("\n_____________________________________");
+        while(1){
+            //password checks and a way to exit
+            printf("Enter your new password(first time) : ");
+            scanf(" %s" , pass1);
+            if(strcmp(pass1 , ":)")==0)
+                return 0;
+
+            if(validpass(pass1)){
+                printf("\nEnter your new password again(second time) : ");
+                scanf(" %s" , pass2);
+                if(strcmp(pass2 , ":)")==0)
+                    return 0;
+
+                if(validpass(pass2)){
+                    if(strcmp(pass1 , pass2 )==0){
+                        //looking for username to change the pass word
+                        temp = head ;
+                        while(temp != NULL){
+                            if(strcmp(temp->username_mem , M.username_mem)==0){
+                                strcpy(temp->pass_mem, pass1);
+                                //save the changes and write it in a new file
+                                memberSavechanges(head);
+                                puts("\n~Your password has been changed successfully.");
+                                Sleep(2000);
+                                return 1;
+                            }
+                            temp = temp->link ;
+                        }
+                    }
+                    else{
+                        puts("\n~Passwords do not match , try again!");
+                        continue;
+                    }
+                }
+                else
+                    puts("\n~Invalid password!");
+            }
+            else
+                puts("\n~Invalid password!");
+        }
+        break;
+    case '2':
+        printf("\n\n~Changing phone number...");
+        Sleep(2000);
+        puts("_______________________________________");
+        while(1){
+            printf("\nEnter your new phone number : ");
+            scanf(" %s" , input);
+            if(strcmp(input , ":)")==0)
+                return 0;
+
+            if(validphone(input)){
+                temp = head ;//for repeating the cycle
+                while(temp != NULL){
+                    if(strcmp(temp->username_mem, M.username_mem)==0){
+                        strcpy(temp->phone , input);
+                        //save the changes and write it in a new file
+                        memberSavechanges(head);
+                        puts("\n~Your phone number has been changed successfully.");
+                        Sleep(2000);
+                        return 1;
+                    }
+                    temp = temp->link ;
+                }
+            }
+            else
+                puts("\n~Invalid phone number!");
+        }
+        break;
+    case '3':
+        printf("\n\nChanging Email address...");
+        Sleep(2000);
+        puts("____________________________________");
+        while(1){
+            printf("\nEnter your new E-mail address : ");
+            scanf(" %s" , input);
+            if(strcmp(input , ":)")==0)
+                return 0;
+
+            if(validemail(input)){
+                temp = head ;//for repeating the cycle
+                while(temp != NULL){
+                    if(strcmp(temp->username_mem , M.username_mem)==0){
+                        strcpy(temp->email , input);
+                        //save the changes and write it in a new file
+                        memberSavechanges(head);
+                        puts("\n~Your Email address has been successfully changed!");
+                        Sleep(2000);
+                        return 1;
+                    }
+                    temp = temp->link ;
+                }
+            }
+            else
+                puts("\n~Invalid email!");
+        }
+        break;
+    case '4':
+        return 0;
+    }
+    return 0;
 
 }
 //                               *GENERAL SECTION*
@@ -1107,7 +1453,7 @@ int menu()
 {
     char choice[100];
     char ch ;
-    char current[11];
+    char current[10];
     todaydate(current);
     while(1){
         puts("*******/   Welcome to PeanutZee Library   /*******\n");
@@ -1314,6 +1660,7 @@ int Login(int selection)//input for user selection
     }
     while(selection == 3){
         //check for member log in
+        FILE *m ;
         m = fopen(MEMFILE , "r");
         if(m == NULL){
             printf("The members file has not found!\nReturning to main menu...");
@@ -1422,7 +1769,7 @@ int validusername(char user[10])
 }
 int validpass(char pass[20])
 {
-    printf("pass");
+    printf("pass");//1 for yes and 0 for no
 }
 int validphone(char phone[11])
 {
@@ -1549,3 +1896,135 @@ void todaydate(char *current)
     sprintf(current , "%02d/%02d/%d" , local->tm_mday , local->tm_mon + 1 , local->tm_year+1900);//(dd/mm/yyyy)
 }
 //......................................................Functions to use linked list
+//...................to create a linked list with the info of a file and return the pointer
+struct employee* CallFileLinkEmp()
+{
+    //create the first node
+    struct employee *start = NULL;
+    struct employee *temp = NULL;
+    struct employee *fresh = NULL ;
+    //open file
+    FILE *f;
+    f = fopen(EMPFILE , "r");
+    if(f == NULL){
+        puts("\n~File not found!");
+        return NULL;
+    }
+    else{
+        start = malloc(sizeof(struct employee));
+        if(start == NULL){
+            puts("\n~memory error!");
+            fclose(f);
+            return NULL;
+        }
+        temp = start ;
+        temp->link = NULL ;
+        //read the info from file and fill the first node
+        while(fscanf(f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" , temp->username_emp , temp->pass_emp
+                    ,temp->id_emp , temp->join_date_e , temp->name , temp->family , temp->phone , temp->email) != EOF ){
+                //add a new node
+                fresh = malloc(sizeof(struct employee));
+                if(fresh == NULL){
+                    puts("\n~memory error!");
+                    fclose(f);
+                    return NULL;
+                }
+                temp->link = fresh ;
+                fresh->link = NULL;
+                temp = fresh ;
+        }
+        if(temp == fresh){//delete the last node
+            free(temp);
+            temp = NULL;
+        }
+        fclose(f);
+        return start;
+    }
+}
+struct member* CallFileLinkMem()
+{
+    //create the first node
+    struct member *start = NULL;
+    struct member *temp = NULL;
+    struct member *fresh = NULL ;
+    //open file
+    FILE *f;
+    f = fopen(MEMFILE , "r");
+    if(f == NULL){
+        puts("\n~File not found!");
+        return NULL;
+    }
+    else{
+        start = malloc(sizeof(struct member));
+        if(start == NULL){
+            puts("\n~memory error!");
+            fclose(f);
+            return NULL;
+        }
+        temp = start ;
+        temp->link = NULL ;
+        //read the info from file and fill the first node
+        while(fscanf(f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" , temp->username_mem , temp->pass_mem
+                    ,temp->id_mem , temp->join_date_m , temp->name , temp->family , temp->phone , temp->email) != EOF ){
+                //add a new node
+                fresh = malloc(sizeof(struct member));
+                if(fresh == NULL){
+                    puts("\n~memory error!");
+                    fclose(f);
+                    return NULL;
+                }
+                temp->link = fresh ;
+                fresh->link = NULL;
+                temp = fresh ;
+        }
+        if(temp == fresh){//delete the last node
+            free(temp);
+            temp = NULL;
+        }
+        fclose(f);
+        return start;
+    }
+}
+//.......................................to save changes in staff file
+void savechanges_emp(struct employee *head)
+{
+    struct employee *temp = head ;
+    FILE *f ;
+    f = fopen(EMPFILE , "w");
+    if(f == NULL){
+        printf("\n~File not found!");
+        return;
+    }
+    else{
+        while(temp != NULL){
+            fprintf(f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" , temp->username_emp , temp->pass_emp
+                    ,temp->id_emp , temp->join_date_e , temp->name , temp->family , temp->phone , temp->email);
+            //next employee
+            temp = temp->link ;
+        }
+    }
+
+    fclose(f);
+    free(head);
+}
+void memberSavechanges(struct member *head)
+{
+    struct member *temp = head ;
+    FILE *f ;
+    f = fopen(MEMFILE , "w");
+    if(f == NULL){
+        printf("\n~File not found!");
+        return;
+    }
+    else{
+        while(temp != NULL){
+            fprintf(f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" , temp->username_mem , temp->pass_mem
+                    ,temp->id_mem , temp->join_date_m , temp->name , temp->family , temp->phone , temp->email);
+            //next member
+            temp = temp->link ;
+        }
+    }
+
+    fclose(f);
+    free(head);
+}

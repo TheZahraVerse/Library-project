@@ -15,33 +15,32 @@
 #define MEMFILE "Membersprofile.txt"
 #define GBOOKFILE "Generalbooks.txt"
 #define BORROWED "borrowedbooks.txt"
-#define AVAILED "availbooks.txt"
 #define ARCSTAFF "Staffarchive.txt"
 #define ARCMEMBER "Membersarchive.txt"
 //..........................................Functions
 //Linked list functions
 struct employee* CallFileLinkEmp();
 struct member* CallFileLinkMem();
+struct book* CallFileLinkBook();
 //General Functions
 void manage(int here);
 int menu();//done
 int Login();//solved
 void hidepass(char pass[PASSWORD]);//done
-int validusername(char user[10]);
-int validphone(char phone[10]);
-int validname(char name[20]);
-int validID(char ID[10]);
-int validemail(char email[20]);
-int validdate(char date[20]);
-int isinfile(char input[100] , char file[100]);
-void todaydate(char *current);
-void oneyear(char *date);
-void repeat();//done
+int validusername(char user[10]);//done
+int validphone(char phone[10]);//done
+int validname(char name[20]);//done
+int validID(char ID[10]);//done
+int validemail(char email[20]);//done
+int validdate(char date[20]);//done
+int isinfile(char input[100] , char file[100]);//done
+void todaydate(char *current);//done
+void oneyear(char *date);//done
 int exitpro();//done
 //Admin Functions
 int adminMenu();//done
-void newEmp();//..............................................
-void staffList();//.............................................
+void newEmp();//done
+void staffList();//done
 void rmEmp(struct employee *head);//..................................................
 void report_ad();//.............................................
 //staff Functions
@@ -56,11 +55,11 @@ int setting_emp(struct employee *head);//.......................................
 void savechangesEmp(struct employee *head);
 //Member Functions
 int memberMenu();//done
-void memNewBook();//...........................................
-void memReturn();//.............................................
-void memAllBooks();//............................................
+void memNewBook(struct book *head);//done
+void memReturn();//..................................
+void memAllBooks(struct book *general);//done
 void availBooks();//done
-int memberSetting(struct member *head);
+int memberSetting(struct member *head);//................
 void savechangeMem(struct member *head);
 //Staff structure
 struct employee
@@ -72,7 +71,7 @@ struct employee
     char join_date_e[15];
     char phone[20];
     char id_emp[20];
-    char email[40];
+    char email[60];
     char status[30]; // to know what her position is
     struct employee *link ;
 };
@@ -89,7 +88,7 @@ struct member
     char validate[15];
     char phone[20];
     char id_mem[20];
-    char email[40];
+    char email[60];
     char status[30]; //condition for each member to know the position
     struct member *link ;
 };
@@ -108,7 +107,7 @@ struct book
     struct book *link ;
 };
 struct book B ;
-//free the memory allocations
+//.....................................free the memory allocations
 void freelistEmp(struct employee *head)
 {
     struct employee *temp ;
@@ -127,8 +126,16 @@ void freelistMem(struct member *head)
         free(temp);
     }
 }
-
-//*******************************************...Main
+void freelistBook(struct book *head)
+{
+    struct book *temp ;
+    while(head != NULL){
+        temp = head;
+        head = head->link;
+        free(temp);
+    }
+}
+//**********************************...Main...*****************************************
 void main()
 {
     int here ;
@@ -139,15 +146,18 @@ void main()
     int run = 1 ;
     struct employee *head_emp = NULL ;
     struct member *head_mem = NULL ;
+    struct book *head_b = NULL;
     //first try
     here = menu();
     do{
         //free the memory allocation
         freelistEmp(head_emp);
         freelistMem(head_mem);
+        freelistBook(head_b);
         //create the linked list of files
         head_emp = CallFileLinkEmp();
         head_mem = CallFileLinkMem();
+        head_b = CallFileLinkBook();
 
         //the choices of main menu
         switch(here)
@@ -266,13 +276,13 @@ void main()
                 who = 0;
                 break;
             case 1 :
-                memNewBook();
+                memNewBook(head_b);
                 break;
             case 2 :
                 memReturn();
                 break;
             case 3 :
-                memAllBooks();
+                memAllBooks(head_b);
                 break;
             case 4 :
                 availBooks();
@@ -640,6 +650,7 @@ void rmEmp(struct employee *head)
 //...................................................reports
 void report_ad()
 {
+
 
 }
 //                               *STAFF SECTION*
@@ -1348,20 +1359,175 @@ int memberMenu()
         }
 }
 //........................................................borrow new books
-void memNewBook()
+void onemonth(char *date)
 {
-
-
+    int year , month , day;
+    //get amounts of a date array
+    sscanf(date , "%d/%d/%d" , &day , &month , &year);
+    //one more year
+    month++ ;
+    if(month > 12){
+        month = 1;
+        year++ ;
+    }
+    sprintf(date , "%02d/%02d/%d" , day , month , year);
 }
+void borrowsave(char id[15] )//for saving in file
+{
+    //get the date
+    char current[15];
+    todaydate(current);
+    //open the borrowed file
+    FILE *f ;
+    f = fopen(BORROWED , "a");
+    if(f == NULL){
+        puts("\n~Could not read the file!");
+        return;
+    }
+    else{
+        fprintf(f , "%s\n%s\n%s\n" , id , current , M.username_mem);
+    }
+    fclose(f);
+}
+void memNewBook(struct book *head)//for process
+{
+    struct book *temp = head;
+    struct book copy;
+    char input[20];
+    printf("\n~Borrow books process...");
+    Sleep(2000);
+    //show the list to choose
+    puts("\n\n** Here is the list of all books with their status **\n\n~pick up your desired book and Enter the book ID at the end of the list~");
+    Sleep(3000);
+    availBooks();
+    printf("\n** Enter the book ID :");
+    scanf(" %s" , input);
+    if(strcmp(input , ":)")==0)
+        return;
+    if(isinfile(input , GBOOKFILE)==0){
+        puts("\n~There is no book with this ID!");
+        return ;
+    }
+    //id founded in general file
+    while(temp != NULL){
+        if(strcmp(temp->id_book , input)==0){//looking for the book
+            if(strcmp(temp->status , "Active")==0){//s in active or not
+                puts("\n~Loading...");
+                Sleep(2000);
+                borrowsave(input);
+                printf("\n~You borrowed this book(for one month)successfully:\n");
+                printf("Name :%s\nAuthor :%s\nPublication :%s\n" , temp->name , temp->writer , temp->publication);
+                //get the date to save validate for books
+                char current[15];
+                todaydate(current);
+                onemonth(current);
+                printf("\n~You can return this book until : %s" , current);
+                return;
+            }
+        }
+        temp = temp->link;
+    }
+}
+
 //........................................................return books
 void memReturn()
 {
 
 }
 //.........................................................all of the member's book
-void memAllBooks()
+struct borrow//define the structure
 {
-
+        char olddate[15];
+        char id[20];
+        char member[20];
+        struct borrow *link;
+};
+//to get a linked list for borrowed books
+struct borrow* CallFileLinkBorrow()
+{
+    struct borrow *start = NULL;
+    struct borrow *temp = NULL ;
+    struct borrow *fresh = NULL ;
+     //open file
+    FILE *f;
+    f = fopen(BORROWED , "r");
+    if(f == NULL){
+        puts("\n~File not found!");
+        return NULL;
+    }
+    else{
+        start = malloc(sizeof(struct borrow));
+        if(start == NULL){
+            puts("\n~memory error!");
+            fclose(f);
+            return NULL;
+        }
+        temp = start ;
+        temp->link = NULL ;
+        //read the info from file and fill the first node
+        while(fscanf(f , "%s\n%s\n%s\n" , temp->id , temp->olddate , temp->member ) != EOF ){
+                //add a new node
+                fresh = malloc(sizeof(struct borrow));
+                if(fresh == NULL){
+                    puts("\n~memory error!");
+                    fclose(f);
+                    return NULL;
+                }
+                temp->link = fresh ;
+                fresh->link = NULL;
+                temp = fresh ;
+        }
+        if(temp == fresh){//delete the last node
+            free(temp);
+            temp = NULL;
+        }
+        fclose(f);
+        return start;
+    }
+}
+void memAllBooks(struct book *general)
+{
+    char guess[15];//array for time to check the activation
+    char current[15];
+    todaydate(current);//for now and compare the dates
+    puts("\n~You are watching the list of your books\n(including borrowed or write-in ones)\n");
+    //call the general book linked list
+    struct book *info = general;
+    //call the linked list to search for member
+    struct borrow *head = CallFileLinkBorrow();
+    struct borrow *temp = head;
+    while(temp != NULL){//search for member
+        if(strcmp(temp->member , M.username_mem)==0){
+            while(info != NULL){//search for information in general file
+                if(strcmp(temp->id , info->id_book)==0){
+                    //show the result
+                    puts("\n_________________________________");
+                    printf("|Name        : %s\n" , info->name);
+                    printf("|Author      : %s\n" , info->writer);
+                    printf("|Publication : %s\n" , info->publication);
+                    //check the date
+                    strcpy(guess , temp->olddate);
+                    onemonth(guess);
+                    if(strcmp( current , guess) <= 0){//still have time to return
+                       strcpy(info->status , "In-Your-Hand");
+                       printf("|Status     :\033[32m %s  until  %s\033[0m\n" , info->status ,guess);
+                    }
+                    else if(strcmp(current , guess) > 0 ){//do not have time warning for return
+                        strcpy(info->status , "Time-Over");
+                        printf("|Status     : \033[31m%s ,Please Return your book!\033[0m\n" , info->status);
+                    }
+                }
+                info = info->link;
+            }
+        }
+        temp = temp->link;
+    }
+    //free borrow linked list
+    while(head != NULL){
+        temp = head ;
+        head = head->link ;
+        free(temp);
+    }
 }
 //..........................................................available books to borrow
 void availBooks()
@@ -1376,14 +1542,12 @@ void availBooks()
     }
     else{
         puts("\n\033[34m****____________List of available books___________****\033[0m");
-        while(fscanf(f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n" ,b.id_book , b.name , b.writer ,
+        while(fscanf(f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" ,b.id_book , b.name , b.writer ,
                     b.publication , b.year , b.reg_date , b.reg_user , b.status ) != EOF){
             if(validname(b.name)){
                 //check for activation
                 if(isinfile(b.id_book , BORROWED)==1)
                     strcpy(b.status , "Borrowed");
-                else if(isinfile(b.id_book , AVAILED)==1)
-                    strcpy(b.status , "Active");
                 else if(isinfile(b.id_book , GBOOKFILE)==1 || strcmp(b.status , "Active")==0)
                     strcpy(b.status , "Active");
                 else if(!(isinfile(b.id_book , GBOOKFILE)))
@@ -1407,7 +1571,7 @@ void availBooks()
         }
         printf("\n____________________________________");
         fclose(f);
-        printf("\n\n~Press any key to return to Member menu:");
+        printf("\n\n~Press any key to continue:");
         getche();
         printf("\n\n~Returning to Member menu...");
         Sleep(4000);
@@ -1584,13 +1748,6 @@ int menu()
     }
 
 }
-//......................................................Repeat
-void repeat()
-{
-    printf("\nEnter any key:");
-    getche();
-    printf("\n");
-}
 //.....................................................exit
 int exitpro()
 {
@@ -1708,12 +1865,13 @@ int Login(int selection)//input for user selection
                 if(strcmp(user_file , user_input) == 0){
                     chance = 3 ;//limit for password chances
                     strcpy(E.username_emp , user_file);
+                    //read password from file
+                    fgets(pass_file , PASSWORD , s);
+                    pass_file[strcspn(pass_file, "\n")] = '\0';
+                    //get input
                     printf("Password:");
-                    while(chance > 0){   //.......................Issue in repeating password
+                    while(chance > 0){
                         hidepass(pass_input);
-                        fgets(pass_file , PASSWORD , s);
-                        pass_file[strcspn(pass_file, "\n")] = '\0';
-
                         if(strcmp(pass_file , pass_input) == 0){
                             printf("\n\n\033[32m~Login successfully as (%s)\033[0m\n" , E.username_emp);
                             found = 1 ;
@@ -1724,7 +1882,6 @@ int Login(int selection)//input for user selection
                             if(chance > 0){
                                 printf("\n\033[31mWrong password!\nYou have %d more chances,try again!\033[0m" , chance);
                                 printf("\nPassword:");
-                                hidepass(pass_input);
                             }else{
                                 printf("\n\033[31mToo many wrong passwords!\n___YOU ARE NOT ALLOWED___\n");
                                 printf("\n~After 5 minutes , you can try log in again...\033[0m");
@@ -1766,12 +1923,13 @@ int Login(int selection)//input for user selection
             if(strcmp(user_file , user_input)==0){
                 chance = 3 ;
                 strcpy(M.username_mem , user_file);
+                //read from file
+                fgets(pass_file , PASSWORD , m);
+                pass_file[strcspn(pass_file, "\n")] = '\0';
+                //get input
                 printf("Password:");
                 while(chance > 0){
                 hidepass(pass_input);
-                fgets(pass_file , PASSWORD , m);
-                pass_file[strcspn(pass_file, "\n")] = '\0';
-
                     if(strcmp(pass_file , pass_input)==0){
                         printf("\n\n\033[32m~Login successfully as (%s)\033[0m\n" , M.username_mem);
                         found = 1;
@@ -1782,7 +1940,6 @@ int Login(int selection)//input for user selection
                         if(chance > 0){
                             printf("\n\033[31mWrong password!\nYou have %d more chances,try again!\033[0m" , chance);
                             printf("\nPassword:");
-                            hidepass(pass_input);
                         }else{
                             printf("\n\033[31mToo many wrong passwords!\n_____YOU ARE NOT ALLOWED____\n");
                             printf("\n~After 5 minutes , you can try log in again...\033[0m");
@@ -1950,11 +2107,39 @@ int validdate(char date[10])
     //valid
     return 1;
 }
-int validemail(char email[20])
+int validemail(char email[60])
 {
-    printf("email");
+    int at = 0 , dot = 0;
+    if(strlen(email) > 60 || strlen(email)< 10){
+        puts("\n~Too mush or too few characters for email!\n");
+        return 0;
+    }
+    //check each character
+    int i = 0;
+    while(email[i] != '\0'){
+        //invalid characters
+        if(!(isalpha(email[i])) || email[i] != '-' || email[i] != '_' || email[i] != '.' || email[i] != '@'){
+            puts("\n~Unknown characters!\n");
+            return 0;
+        }
+        //count at and dot
+        if(email[i]=='@')
+            at++ ;
+        //is there any dot after count and it is not the last character
+        if(email[i]=='.' && email[i+1]!='\0'){
+            if(at > 0)
+                dot++ ;
+        }
+        //move to next character
+        i++;
+    }
+    //to be valid
+    if(at == 1 && dot > 0 && email[0]!='@'){
+        return 1 ;
+    }
+    //not valid at all
+    return 0;
 }
-
 //.........................existing
 int isinfile(char input[100] , char file[100])
 {
@@ -2076,6 +2261,51 @@ struct member* CallFileLinkMem()
         return start;
     }
 }
+//................................also for books just general file
+struct book* CallFileLinkBook()
+{
+    struct book *start = NULL;
+    struct book *temp = NULL ;
+    struct book *fresh = NULL ;
+     //open file
+    FILE *f;
+    f = fopen(GBOOKFILE , "r");
+    if(f == NULL){
+        puts("\n~File not found!");
+        return NULL;
+    }
+    else{
+        start = malloc(sizeof(struct book));
+        if(start == NULL){
+            puts("\n~memory error!");
+            fclose(f);
+            return NULL;
+        }
+        temp = start ;
+        temp->link = NULL ;
+        //read the info from file and fill the first node
+        while(fscanf(f , "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" , temp->id_book , temp->name
+                    ,temp->writer , temp->publication ,temp->year, temp->reg_date , temp->reg_user , temp->status) != EOF ){
+                //add a new node
+                fresh = malloc(sizeof(struct book));
+                if(fresh == NULL){
+                    puts("\n~memory error!");
+                    fclose(f);
+                    return NULL;
+                }
+                temp->link = fresh ;
+                fresh->link = NULL;
+                temp = fresh ;
+        }
+        if(temp == fresh){//delete the last node
+            free(temp);
+            temp = NULL;
+        }
+        fclose(f);
+        return start;
+    }
+}
+
 //.......................................to save changes in staff file
 void savechangesEmp(struct employee *head)
 {
